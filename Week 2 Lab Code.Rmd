@@ -1,0 +1,481 @@
+---
+title: "Week 2 Lab Code"
+author: "Section 019"
+date: "2025-01-28"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Review
+## R Basics
+### Create new R Script
+\textbf{Shift} + Control + N (Windows) / \textbf{Shift} + Command + N (Mac)  
+
+### Run R Code
+\textbf{In the Code Editor}  
+Step 1: Select all the codes wanted to run / Move the cursor to the line of code  
+Step 2: Hit \textbf{Control} + Enter (Windows) / \textbf{Command} + Return (Mac)  OR  
+        Click the "Run" button on the top right of Code Editor window  
+  
+Attention:  
+\t Hitting Enter (or Return) only: Start a new line in Code Editor  
+
+\textbf{In the R Console}  
+Step 1: Enter the commands in R Console (only one line of code)  
+Step 2: Hit \textbf{Enter} (Windows) / \textbf{Return} (Mac) only  
+  
+Attention:  
+\t R Console only runs one line of code at a time.
+
+### Add Comments in R
+Use # to add comments, and R will not consider comments as codes or run them.  
+Each time adding a comment, always start with #.  
+One # only works in one line (the same line after #).  
+```{r}
+x <- 1 #add a comment after code
+# add a comment line
+# add another comment line
+```
+
+### Save R Scripts
+Control + S (Windows) / Command + S (Mac)  
+
+### Help Document in R
+In \textbf{R Console}, type ?\textit{function\_name} and run the command.  
+The help document will show in the Help tab in the Files&Plots window.
+  
+e.g.:  
+```{r, results = "hide"}
+?plot
+```
+
+\newpage
+
+## Use R Console as a Calculator
+Basic operations: +, -, *, /  
+
+```{r}
+sqrt(25)
+sqrt(2) #return outcomes in decimals
+```
+\textit{sqrt()} function is used to compute the square root of a number (in decimals if the answer is not an integer).
+Format: \textit{sqrt(n)} $= \sqrt{n}$  
+
+```{r}
+abs(10)
+abs(-10)
+```
+\textit{abs()} function is used to compute the absolute value of a number.  
+Format: \textit{abs(n)} $= |n|$
+
+```{r}
+2 ^ 4
+2 ** 4
+```
+Two ways for the exponentiation.  
+$m \textasciicircum n = m ** n = m ^ n$
+
+```{r}
+#7 % 2
+#This is an invalid command in R
+```
+Error: unexpected input in "3 % 2"
+No % operation in R.  
+We usually use / (divided by) for division method.  
+
+```{r}
+7 / 3
+```
+
+If we want to use the modular arithmetic (get the remainders), we need to use %%.
+```{r}
+7 %% 3
+```
+$7 = 2 * 3 + 1$ (remainder $ = 1$)  
+
+```{r}
+5e3
+5e-2
+```
+\textit{e}: $* \, 10$ to the power of  
+$men = m * 10 ^ n$  
+e.g., $5e3 = 5 * 10 ^ 3 = 5 * 1000 = 5000$, $5e-2 = 5 * 10 ^ {-2} = 3 * 0.01 = 0.05$  
+
+\newpage
+
+## Create new Objects / Vectors
+Use = or <- to create new objects or vectors.  
+Assign the \textbf{value} on the \textbf{right} to an \textbf{object} with the \textbf{name} on the \textbf{left}.  
+= and <- have \textbf{exactly} the same function.  
+Format: \textit{object\_name} = / <- \textit{value}  
+```{r}
+x <- 1
+y = 3
+xy <- x * y
+```
+  
+Use function \textit{c()} to combine many single objects into a vector (c stands for combine).    
+Format: \textit{c($\text{value}_1, \text{value}_2, \cdots$)}  
+```{r}
+vec = c(1, 2, 3, 4, 5, 6)
+vec #print the vector "vec"
+```
+
+Use function \textit{plot()} to draw a \textbf{scatter plot} for \textbf{vectors}.  
+Format: \textit{plot(vector\_name)}
+```{r}
+plot(vec)
+```
+
+\newpage
+
+### Comments
+1. No space in the object name is allowed.  
+Error: unexpected symbol in "object name"  
+```{r}
+#object name = 1: illegal operation in R
+```
+  
+2. R only stores the \textbf{most recent} value of objects with same names.  
+```{r}
+x = 1
+x #the value of x is 1 here
+x = 2 #update the value of x to 2
+x #the value of x is 2 here
+```
+  
+3. R is \textbf{sensitive} to the case of object names.  
+\textit{Object} (or \textit{oBject}, etc.) and \textit{object} are \textbf{different} objects.  
+```{r}
+tempt = c(24, 28, 42, 56, 69, 79, 84, 81, 73) #create a vector called tempt (lower-case T)
+#Tempt stands for a vector called Tempt (upper-case T)
+#Error: object 'Tempt' not found
+tempt #stands for the vector tempt we created (lower-case T)
+```
+
+\newpage
+
+# Set Working Dictionary
+Working directory is a \textbf{folder} that R is \textbf{directly} connected to.  
+After setting the working directory, it is possible to import data sets directly by its \textbf{file name} if the data file is in the working directory.  
+
+## Methods
+Use the Graphical User Interface: Session - Set Working Directory - Choose Directory   
+Use R function: \textit{setwd()} (wd stands for working directory)  
+
+## getwd() and setwd() Function
+### getwd() Fuction
+Use the function \textit{getwd()} to get the current working directory.  
+"wd" stands for working directory.  
+Format: \textit{getwd()} (recall: () are essential parts of a R function)
+```{r}
+getwd()
+```
+
+### setwd() Function
+Use the function \textit{getwd()} to set the working directory to a specified path.  
+Format: \textit{setwd("working/directory/path")}  
+Use the \textbf{a pair of quotation marks} to quote the \textbf{path} in the \textbf{parentheses}.  
+```{r}
+setwd("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 2")
+```
+\textit{setwd()} function will set the working directory to the \textbf{latest} path when running the command \textit{setwd()} for more than once. 
+
+\textbf{Quotation Marks}  
+Content inside the quotation marks will be considered a \textbf{string} (i,e., text) rather than a command.  
+Use quotation marks when input some text into a function.  
+Common scenarios using quotation marks: \textbf{file path}, \textbf{url} (i.e., website), printed \textbf{texts} and \textbf{texts} in graphs, textual \textbf{arguments} (or \textbf{parameters}) in a function, etc.  
+
+\textbf{Find the Path}  
+Windows: [YouTube Video Link](https://youtu.be/QZUpzuQ0X5I?si=20ToKN38dCA_2K4i)  
+Mac: [YouTube Video Link](https://youtu.be/gxU1wlBAsig?si=F3nQkrn8yKlKnxIa)  
+R only accept "/" (slash) in file names.  
+For Windows machines, change the "\\" (backslash) to "/" (slash) after copying the folder path.  
+e.g.:  
+"D:\\Documents\\STAT 3011 TA\\Week 2\\movies2009.csv" $\longrightarrow$   
+"D:/Documents/STAT 3011 TA/Week 2/movies2009.csv"
+  
+Delete all "\\" in the folder path before spaces if there are spaces in the file name.  
+e.g.:  
+"/Users/william/Desktop/Course/25\\ Spring/STAT\\ 3011\\ TA/Week\\ 2/movies2009.csv" $\longrightarrow$  
+"/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 2/movies2009.csv"  
+
+\newpage
+
+# Import Dataset from .csv Files
+Use the function \textit{read.csv()} to read a .csv file from the specified path.  
+\textbf{Types of Paths:}  
+1. File name (only available when using the \textbf{same folder} as the working directory)  
+2. Absolute path (looks like: "D:/path/to/file" on Windows or "/path/to/file" on Mac)  
+3. url (looks like a website: "https://path/to/file")  
+4. \textit{file.choose()} method with a pop window  
+Format: \textit{read.csv("path to file")} or \textit{read.csv(file.choose())}  
+  
+Optional Argument: \textit{header}  
+Separate arguments by , (comma).  
+Default: \textit{header = TRUE} or \textit{header = T} (T is the short for TRUE)  
+If the optional argument of a function is \textbf{not specified}, R will \textbf{automatically} use the \textbf{default settings}.  
+e.g., \textit{read.csv("path to file")} and \textit{read.csv("path to file", header = T)} are the same.  
+\textit{header = TRUE} or \textit{header = T}: consider the \textbf{first row} in the file as \textbf{names of columns}  
+\textit{header = FALSE} or \textit{header = F}: consider the \textbf{first row} in the file as the first row of \textbf{data}  
+  
+\textbf{Attention:}  
+Use \textbf{a pair of quotation marks} to \textbf{quote the path} when using \textbf{file name}, \textbf{absolute path}, and \textbf{url}.  
+\textbf{Retype the quotation marks} if directly copying the codes from Canvas. 
+Put \textbf{exactly} the same file name, including all \textbf{spaces} and the \textbf{name extension .csv}, using the \textbf{exact} cases in the file name.  
+\textbf{DO NOT QUOTE} the \textit{file.choose()} method in a pair of quotation marks, and remember to type the \textbf{PARENTHESES} after the method name. (Recall: parentheses mean \textbf{functions})  
+
+## Use the File Name (set the working directory first)
+Assume the file \textit{Movies 2009.csv} is in the folder "/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 2".
+```{r}
+#make sure setting the correct working directory
+setwd("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 2")
+getwd()
+```
+
+```{r, results = "hide"}
+#use the file name only when the .csv file is in the same folder as the working directory
+movie1 = read.csv("Movies 2009.csv")
+movie1 = read.csv("Movies 2009.csv", header = T)
+```
+
+## Use the Absolute Path
+Assume the file \textit{Movies 2009.csv} is in the folder "/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 2".
+```{r, results = "hide"}
+movie1 = read.csv("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 2/Movies 2009.csv")
+movie1 = read.csv("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 2/Movies 2009.csv",
+         header = T)
+```
+
+\newpage
+
+## Use \textit{file.choose()} Method (Recommended)
+Simplest method to locate the file \textbf{without using the path}.  
+Find and import \textit{.csv} files in a (graphical) \textbf{folder interface}.  
+\textit{file.choose()} method will pop up a window. Locate and select the file in the pop window.  
+```{r, eval = FALSE, results = "hide"}
+movie2 = read.csv(file.choose(), header = T)
+#find and select the .csv file in the pop window
+```
+
+## Use the URL
+Assume the file \textit{Movies 2009.csv} is published on the Internet via the url "http://users.stat.umn.edu/~parky/movies2009.csv".  
+```{r, results = "hide"}
+#retype the quotation marks if directly copying the code from Canvas
+movie3 = read.csv("http://users.stat.umn.edu/~parky/movies2009.csv", header = T)
+```
+
+\newpage
+
+# Explore the Data
+## \textit{View()} Function
+Use function \textit{View()} (\textbf{capital V}) to \textbf{view a dataset}.  
+R will pop up another window in the Code Editor area showing the entire dataset.  
+Format: \textit{View(dataset\_name)}  
+```{r}
+View(movie1)
+```
+
+## \textit{names()} Function
+Use function \textit{names()} to \textbf{print names} of \textbf{all variables}.  
+Format: \textit{names(dataset\_name)}  
+```{r}
+names(movie1)
+```
+
+## \textit{head()} Function
+Use function \textit{head()} to print \textbf{top 6 rows}.  
+Format: \textit{head(dataset\_name)}  
+```{r}
+head(movie1)
+```
+
+Optional Argument: $n$, change the number of rows printed  
+Separate arguments by , (comma).  
+Default: $n = 6$  
+Format: \textit{head(dataset\_name, $n =$ number\_of\_rows)}  
+```{r}
+head(movie1, n = 10)
+```
+
+## \textit{tail()} Function
+Use function \textit{tail()} to print \textbf{bottom 6 rows}.  
+Format: \textit{tail(dataset\_name)}  
+```{r}
+tail(movie1)
+```
+
+Optional Argument: $n$, change the number of rows printed  
+Separate arguments by , (comma).  
+Default: $n = 6$  
+Format: \textit{tail(dataset\_name, $n =$ number\_of\_rows)}  
+```{r}
+tail(movie1, n = 10)
+```
+
+## \textit{str()} Function
+Use function \textit{str()} to show the structure of a dataset (str stands for structure).  
+Format: \textit{str(dataset\_name)}  
+```{r}
+str(movie1)
+```
+### Interpretation
+First column: variable \textbf{names}  
+  
+Second column: variable \textbf{types}  
+chr: \textbf{characters} (usually \textbf{categorical variables})
+num: \textbf{numbers} with \textbf{decimals} (usually \textbf{quantitative variables} - continuous variables)    
+int: \textbf{integers} (usually \textbf{quantitative variables} - discrete / continuous variables)  
+  
+Remaining columns: \textbf{values} of the corresponding variables  
+
+\textbf{In this Example:}
+Categorical variables: Movie, Rating, Genre  
+Quantitative variables: Total.Gross, Opening, Screens, RT, International, DVD, Budget, Rating  
+
+## $ Operation
+```{r}
+#Total.Gross
+```
+Error: object 'Total.Gross' not found  
+The variable \textit{Total.Gross} is not \textbf{directly} available under the current environment because the variable is within the dataset \textit{movie1}.  
+Need to \textbf{extract} the variable from a dataset.  
+  
+Use \textit{\$} operation to extract a variable from a object (dataset here).  
+Format: \textit{variable\_name\$dataset\_name}  
+\textbf{DO NOT} put the variable names and dataset names in quotation marks (the same as object or vector names).  
+Extract the variable with \textit{variable\_name} from the dataset named \textit{dataset\_name}.  
+Might have errors if there is \textbf{no such a dataset} named \textit{dataset\_name}, or \textbf{no such a variable} named \textit{variable\_name} in the dataset \textit{dataset\_name} in the environment.  
+Hit \textbf{Tab} to auto-complete the names of variables and datasets.  
+```{r}
+movie1$Total.Gross
+```
+
+\textbf{Bad Examples}  
+```{r}
+#movie1$variable
+#return NULL because there is no variable named "variable" in the dataset movie1
+```
+
+\newpage
+
+## Draw Histograms and Boxplots
+### Histograms
+Use \textit{hist()} function to draw histograms (hist stands for histogram).  
+Format: \textit{hist(variable\_name)}, use \textbf{variable names} rather than dataset names here
+```{r}
+hist(movie1$Total.Gross)
+```
+
+\newpage
+
+Optional Arguments: \textit{main}, \textit{xlab}, \textit{ylab}, etc.  
+Separate arguments by , (comma).  
+\textit{main}: the \textbf{main title} of the histogram  
+\textit{xlab} (stands for x label): the \textbf{x-axis title} of the histogram  
+\textit{ylab} (stands for y label): the \textbf{y-axis title} of the histogram  
+```{r}
+hist(movie1$Total.Gross, main = "Histogram of Total Gross", xlab = "in millions USD")
+```
+
+\newpage
+
+### Boxplots
+Use \textit{boxplot()} function to draw boxplots.   
+Format: \textit{boxplot(variable\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+boxplot(movie1$Total.Gross)
+```
+
+\newpage
+
+Optional Arguments: \textit{ylim}, etc (also has \textit{main}, \textit{xlab}, \textit{ylab}).  
+Separate arguments by , (comma).  
+\textit{ylim} (stands for y limit): set the lower and upper limit of y-axis
+Format: \textit{ylim = c(lower\_limit, upper\_limit)}  
+Recall: \textit{c()} will create a vector by combining all elements inside the parentheses  
+```{r}
+boxplot(movie1$Total.Gross, ylim = c(0, 300))
+```
+
+### Describe the Distribution
+The distribution of Total Gross is extremely \textbf{right-skewed}, with \textbf{many outliers}. Total gross \textbf{varies from approximately $\mathbf{0}$ to $\mathbf{800}$} million USD. \textbf{Most movies'} (around 100 movies out of 129 observations from this data) box office sales are less than or equal to 100 million USD.  
+
+\newpage
+
+## Other Useful Functions (Optional for this Lab)
+### \textit{table()} Function
+Use \textit{table()} function to get the \textbf{frequency table}.  
+Frequency: the number of times of appearance for each possible value of a variable  
+Format: \textit{table(variable\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+table(movie1$Rating) #frequency table of variable "Rating"
+```
+
+### \textit{mean()} Function
+Use \textit{mean()} function to compute the \textbf{mean} (i.e., average) of a (numerical) vector (quantitative variable in this dataset).  
+Format: \textit{mean(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+mean(movie1$Total.Gross)
+```
+
+Optional Arguments: \textit{na.rm}, \textit{trim}, etc.  
+\textbf{na.rm}  
+\textit{na.rm} $=$ \textit{TRUE}: remove \textbf{NAs} (\textbf{missing observations}) in the vector, then compute the mean of the remaining parts  
+```{r}
+na_vec = c(1, 2, 3, NA, 4, 5)
+mean(na_vec) #output is NA
+mean(na_vec, na.rm = T) #remove the missing value, then compute the mean of (1, 2, 3, 4, 5)
+```
+
+The outcome will be \textbf{NA} when computing the mean of a vector with missing observations (NA in the vector)  
+\textbf{trim}  
+\textit{trim} $= n$, where $0 \leq n < 1$: remove the \textbf{top and bottom} $n$ proportion of the variable, then compute the mean of the remaining parts   
+```{r}
+mean(movie1$Total.Gross)
+mean(movie1$Total.Gross, trim = 0.1) #remove the top 10% and the bottom 10%
+```
+
+### \textit{median()} Function
+Use \textit{median()} function to compute the \textbf{median} of a (numerical) vector (quantitative variable in this dataset).  
+Format: \textit{median(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+median(movie1$Total.Gross)
+```
+
+### \textit{summary()} Fuction
+Use \textit{summary()} function to print the \textbf{5-number summary} (min, 1st quantile, median, 3rd quantile, max) of a (numerical) vector (quantitative variable in this dataset).  
+Format: \textit{summary(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+summary(movie1$Total.Gross)
+```
+
+### \textit{IQR()} Function
+Use \textit{IQR()} function to compute the \textbf{interquantile range} ($\text{3rd quantile} - \text{1st quantile}$) of a (numerical) vector (quantitative variable in this dataset).  
+Format: \textit{IQR(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+IQR(movie1$Total.Gross)
+93.954 - 22.456 #compute IQR manually from 5-number summary
+```
+
+### \textit{sd()} Function
+Use \textit{sd()} function to compute the \textbf{(sample) standard deviation} of a (numerical) vector (quantitative variable in this dataset).  
+$s = \sqrt{\frac{1}{\mathbf{n - 1}} \sum_{i = 1}^{n} (x_i - \bar{x}) ^ 2}$  
+Format: \textit{sd(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+sd(movie1$Total.Gross)
+```
+
+### \textit{max()} and \textit{min()} Function
+Use \textit{max()} function to compute the \textbf{maximum} of a (numerical) vector (quantitative variable in this dataset).  
+Use \textit{min()} function to compute the \textbf{minimum} of a (numerical) vector (quantitative variable in this dataset).  
+Format: \textit{max(vector\_name)} or \textit{min(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+max(movie1$Total.Gross) #max = 749.085 (from the 5-number summary)
+min(movie1$Total.Gross) #min = 8.665 (from the 5-number summary)
+```
