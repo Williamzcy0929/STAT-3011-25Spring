@@ -347,7 +347,7 @@ The variable \textit{Total.Gross} is not \textbf{directly} available under the c
 Need to \textbf{extract} the variable from a dataset.  
   
 Use \textit{\$} operation to extract a variable from a object (dataset here).  
-Format: \textit{variable\_name\$dataset\_name}  
+Format: \textit{dataset\_name\$variable\_name}  
 \textbf{DO NOT} put the variable names and dataset names in quotation marks (the same as object or vector names).  
 Extract the variable with \textit{variable\_name} from the dataset named \textit{dataset\_name}.  
 Might have errors if there is \textbf{no such a dataset} named \textit{dataset\_name}, or \textbf{no such a variable} named \textit{variable\_name} in the dataset \textit{dataset\_name} in the environment.  
