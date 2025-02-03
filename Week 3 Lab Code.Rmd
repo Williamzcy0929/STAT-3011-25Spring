@@ -1,0 +1,368 @@
+---
+title: "Week 3 Lab Code"
+author: "Section 019"
+date: "2025-02-04"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Importing Dataset
+## Importing Dataset from .csv Files
+Recall: use \textit{read.csv()} to import a dataset from \textbf{.csv} files  
+```{r, eval = FALSE}
+movie = read.csv("http://users.stat.umn.edu/~parky/movies2009.csv", header = T)
+```
+
+### Approaches
+Use the file name (under the same working directory)  
+Use the absolute path  
+Use the URL  
+Use \textit{file.choose()} method  
+```{r, eval = FALSE}
+movie = read.csv("movie2009.csv") #with quotation marks
+movie = read.csv("/.../movies2009.csv") #with quotation marks
+movie = read.csv("http://users.stat.umn.edu/~parky/movies2009.csv")
+movie = read.csv(file.choose()) #no quotation marks
+```
+
+Optional argument: \textit{header} (default: \textit{TRUE} or \textit{T})  
+header = T: consider the first row in the dataset as the \textbf{column names}  
+
+## Importing Dataset from Other Types of Files
+Use \textit{read.delim()} function to read a \textbf{tab-separated-value} file (usually \textbf{.txt} or \textbf{.tsv}) from the specified path.  
+Note: csv: comma-separated-value  
+\textit{read.xxx()} family have similar formats (file path, optional arguments, etc.).  
+See more information by using:
+```{r, eval = FALSE}
+?read.delim() #R will show all read.xxx() family functions
+```
+
+### Approaches (same as \textit{read.csv()})
+Use the file name (under the same working directory) - \textbf{with} quotation marks  
+Use the absolute path - \textbf{with} quotation marks  
+Use the URL - \textbf{with} quotation marks  
+Use \textit{file.choose()} method - \textbf{no} quotation marks  
+
+Optional argument: \textit{header} (default: \textit{TRUE} or \textit{T})  
+header = T: consider the first row in the dataset as the \textbf{column names}  
+
+```{r, results = "hide"}
+m_new = read.delim("http://users.stat.umn.edu/~parky/movies2009new.txt")
+m_new = read.delim("http://users.stat.umn.edu/~parky/movies2009new.txt", header = T) #personal habit
+```
+Attention: \textbf{retype the quotation marks} if the code is directly copied from Canvas.  
+
+\newpage
+
+# Exploring the Data
+## \textit{names()} Function
+Use function \textit{names()} to \textbf{print names} of \textbf{all variables}.  
+Format: \textit{names(dataset\_name)}  
+```{r}
+names(m_new)
+```
+
+## \textit{table()} Function
+Use \textit{table()} function to get the \textbf{frequency table}.  
+Frequency: the number of times of appearance for each possible value of a variable  
+Format: \textit{table(variable\_name)}, use \textbf{variable names} rather than dataset names here  
+  
+Recall: use \textit{\$} to extract a variable from a dataset  
+Format: \textit{dataset\_name\$variable\_name}  
+```{r}
+#target variable: Rating
+table(m_new$Rating)
+```
+
+### Lab Handout Answer
+According to the frequency table, $29$ movies are PG, and $39$ movies are R.  
+
+```{r}
+4 + 29 + 57 + 39 #use R as a calculator
+```
+There are $129$ movies in total.  
+(The answer can also be found in the \textbf{Environment window}: 129 obs)  
+
+```{r}
+# PG-13: 57
+# total: 129
+57 / 129 #use R as a calculator
+```
+
+\textbf{Vectorized Computation}  
+R is a vectorized programming language.  
+If we apply an operation on a \textbf{vector} (e.g., objects created by function \textit{c()}), R will apply the operation on \textbf{each item} simultaneously and \textbf{individually}.  
+An example:  
+```{r}
+vec = c(1, 2, 3, 4)
+vec
+vec + 1 #c(1 + 1, 2 + 1, 3 + 1, 4 + 1)
+vec * 2 #c(1 * 2, 2 * 2, 3 * 2, 4 * 2)
+```
+
+Since the return result of \textit{table()} function is a \textbf{vector}, we can apply the vectorized computation rule on it and compute the proportion for all items.  
+```{r}
+table(m_new$Rating) / 129
+```
+
+
+Use \textit{round()} function to round decimals.  
+Format: \textit{round(item, $n$)}, where $n$ is the decimal place
+```{r}
+round(1.1111, 3)
+round(2.546, 2)
+```
+
+Since \textit{round()} is also an \textbf{operation}, we can also apply it to a vector.  
+```{r}
+round(table(m_new$Rating) / 129, 3)
+```
+
+About $0.442$ (or $44.2\%$) of the movie are PG-13.  
+
+\newpage
+
+## Draw Histograms and Boxplots
+### Histograms
+Use \textit{hist()} function to draw histograms (hist stands for histogram).  
+Format: \textit{hist(variable\_name)}, use \textbf{variable names} rather than dataset names here
+Optional argument: \textit{breaks}  
+\textit{breaks $= n$}: adjust the shape to show \textbf{"approximately"} $n$ cells in the histogram  
+```{r}
+#target variable: Budget
+hist(m_new$Budget, breaks = 15)
+```
+
+We can also add optional arguments such as \textit{main}, \textit{xlab}, and \textit{ylab} to add more information in the histogram.  
+
+\newpage
+
+### Boxplots
+Use \textit{boxplot()} function to draw boxplots.   
+Format: \textit{boxplot(variable\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+#target variable: Budget
+boxplot(m_new$Budget)
+```
+
+We can also add optional arguments such as \textit{main}, \textit{xlab}, and \textit{ylab} to add more information in the boxpolt, or add optional arguments \textit{ylim} to adjust the y-axis limit.  
+
+### Lab Handout Answer
+The shape of this distribution is unimodal and right-skewed (because there is a tail on the right of the histogram). There are some extremely large outliers distributed above $120$. This distribution ranges from $0$ to more than $250$. Most data points are distributed from $0$ to $50$. The median of this variable is about $40$.  
+There are some extremely large outliers above $120$.  
+Boxplot is easier to identify outliers because the data points above the upper whisker or below the lower whisker are outliers.  
+
+\newpage
+
+# Numerical Summaries
+## \textit{summary()} Fuction
+Use \textit{summary()} function to print the \textbf{5-number summary} (min, 1st quantile, median, 3rd quantile, max) of a (numerical) vector (quantitative variable in this dataset).  
+Format: \textit{summary(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+#target variable: Budget
+summary(m_new$Budget)
+```
+
+Note: 
+\textit{summary()} function might provide more information (such as mean and number of NA).  
+For 5-number summary, we only need \textbf{min}, \textbf{1st quantile}, \textbf{median}, \textbf{3rd quantile}, and \textbf{max}.  
+
+### Lab Handout Answer
+5 number summary of Budget (in million USD) is:  
+$\text{Minimum} = 0.1$ (\$$100,000$)  
+$\text{Q}_1 = 20$ (million USD)  
+$\text{Median} = \text{Q}_2 = 38.5$ (million USD)  
+$\text{Q}_3 = 61.25$ (million USD)  
+$\text{Maximum} = 250$ (million USD)  
+
+## \textit{mean()} Function
+Use \textit{mean()} function to compute the \textbf{mean} (i.e., average) of a (numerical) vector (quantitative variable in this dataset).  
+Format: \textit{mean(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+#target variable: Budget
+mean(m_new$Budget)
+```
+
+The result is \textit{NA} because there are \textbf{missing values (NAs)} in this variable (\textit{NA's} $ = 9$ in the output of \textit{summary()} function).  
+  
+\textbf{Optional Arguments: \textit{na.rm}} (rm stands for remove)  
+Default: \textit{na.rm} $=$ \textit{FALSE}, compute all the mean of all entries of a vector (including NAs)  
+\textit{na.rm} $=$ \textit{TRUE} or \textit{T}: remove \textbf{NAs} (\textbf{missing observations}) in the vector, then compute the mean of the remaining parts  
+```{r}
+mean(m_new$Budget, na.rm = T)
+```
+
+Set \textit{na.rm = T} if the default result is \textit{NA} or knowing that there are missing values in the vector (quantitative variable).  
+  
+\textbf{Optional Arguments: \textit{trim}}  
+Separate arguments by \textbf{comma} (,).  
+\textit{trim} $= n$, where $0 \leq n < 1$: remove the \textbf{top and bottom} $n$ proportion of the variable, then compute the mean of the remaining parts   
+```{r}
+mean(m_new$Budget, na.rm = T)
+mean(m_new$Budget, na.rm = T, trim = 0.1) #remove the top 10% and the bottom 10%
+```
+
+## \textit{sd()} Function
+Use \textit{sd()} function to compute the \textbf{(sample) standard deviation} of a (numerical) vector (quantitative variable in this dataset).  
+$s = \sqrt{\frac{1}{\mathbf{n - 1}} \sum_{i = 1}^{n} (x_i - \bar{x}) ^ 2}$  
+Format: \textit{sd(vector\_name)}, use \textbf{variable names} rather than dataset names here  
+```{r}
+#target variable: Budget
+sd(m_new$Budget)
+```
+
+Similarly, since there are \textbf{missing values (NAs)} in this variable, the result is \textit{NA}.  
+We still need to set the argument \textit{na.rm = TRUE} or \textit{na.rm = T}.  
+
+\textbf{Optional Arguments: \textit{na.rm}} (rm stands for remove)  
+Default: \textit{na.rm} $=$ \textit{FALSE}, compute all the (sample) standard deviation of all entries of a vector (including NAs)  
+\textit{na.rm} $=$ \textit{TRUE} or \textit{T}: remove \textbf{NAs} (\textbf{missing observations}) in the vector, then compute the (sample) standard deviation of the remaining parts  
+```{r}
+sd(m_new$Budget, na.rm = T)
+```
+
+### Lab Handout Answer
+We want to compute how many standard deviations this movie budget ($85$ million) is away from the mean.  
+Formula: $z = \frac{x_i - \bar{x}}{s}$  
+We will use the sample mean and sample standard deviation to compute. In this case, \textbf{create objects} to \textbf{store their values} will avoid some repetitive computations.  
+```{r}
+#x_i = 85 here (according to the context)
+xbar = mean(m_new$Budget, na.rm = T)
+s = sd(m_new$Budget, na.rm = T)
+(85 - xbar) / s
+```
+
+The movie budget is $0.539056$ standard deviation above the mean.  
+Since $\lvert 0.539056 \rvert < 3$, the result is not usually large because it is only approximately a half standard deviation above the mean.  
+  
+Note that in this example, because the distribution of Budget is \textbf{extremely right-skewed} (based on the histogram and the boxplot), the standard deviation may have been inflated by \textbf{extreme outliers}. In this case, \textbf{IQR} may represent the spread of this data better.    
+
+\newpage
+
+# Side-by-side Boxplot
+"Vanilla" \textit{boxplot(vector\_name)} will draw \textbf{one} boxplot for the \textbf{entire distribution} of only \textbf{one} vector (or quantitative variable in practice).  
+Sometimes, we want to compare \textbf{more than one distribution} in \textbf{one} graph (i.e., draw \textbf{more than one} boxplots for \textbf{more than one} distributions \textbf{simultaneously}). In this case, we need to draw a \textbf{side-by-side boxplot} to compare these distributions.   
+\textbf{Two scenarios using side-by-side boxplot}:  
+Divide \textbf{one} distribution across \textbf{different levels} and compare  
+Compare \textbf{more than one} distributions  
+
+## Divide one Distributions across Different Levels
+We separate the whole distribution of a \textbf{variable} (ususally \textbf{quantitative} variable) into different \textbf{levels} by the values of other variables (usually categorical variables).  
+
+### ~ (Tilde) Formula Grammar in R
+In R, we usually use "~" for a \textbf{response-explanatory} relationship.  
+Format: \textit{response\_variable}\$\textit{explanatory\_variable}  
+We will use similar grammar later in this semester (regression).  
+
+For boxplot, \textit{response\_variable}\$\textit{explanatory\_variable} means: create a side-by-side boxplot of \textbf{response\_variable} (usually a \textbf{quantitative} variable) separated by the different levels of \textit{explanatory\_variable} (usually a \textbf{categorical} variable), which is used to \textbf{compare the distribution} of the \textbf{quantitative} variable values across different categories of the \textbf{categorical} variable.  
+```{r}
+#explanatory variable: Rating (categorical)
+#response variable: Budget (quantitative)
+boxplot(m_new$Budget ~ m_new$Rating, 
+        xlab = "Ratings", ylab = "In Million USD", main = "Budget")
+```
+
+R will automatically create \textbf{lables} for each \textbf{levels} (G, PG, PG-13, R here, which are possible values of the explanatory variable \textit{Rating} - after ~).  
+
+### Lab Handout Answer
+From the side-by-side boxplot, we can find that \textit{PG} tends to have a higher budget because it has a higher \textbf{median}. For other quantitative information, such as the \textbf{1st quantile}, \textbf{3rd quantile}, and \textbf{maximum}, they are also higher.  
+
+Optional Arguments: \textit{main}, \textit{xlab}, \textit{ylab}, etc.  
+Separate arguments by , (comma).  
+\textit{main}: the \textbf{main title} of the boxplot  
+\textit{xlab} (stands for x label): the \textbf{x-axis title} of the boxplot  
+\textit{ylab} (stands for y label): the \textbf{y-axis title} of the boxplot  
+
+## Compare More Than One Distributions
+Usually, we call this type of data \textbf{matched pairs} data. (Chapter 10)  
+Use \textit{boxplot(vector\_name\_1, vector\_name\_2, $\cdots$)} to draw \textbf{more than one boxplots} for \textbf{more than one distributions} in \textbf{one graph}.   
+```{r}
+#distribution1: Rotten Tomatoes (RT)
+#distribution2: Metacritic
+boxplot(m_new$RT, m_new$Metacritic, 
+        names = c("Rotten Tomatoes", "Metacritic"), main = "Review scores")
+```
+
+Optional Arguments: \textit{names}, \textit{main}, etc.  
+Separate arguments by , (comma).  
+\textit{names}: the \textbf{name} for each sub-boxplot, usually a vector of \textbf{strings}.  
+Recall: use \textit{c()} function to create a vector; put a string in a pair of \textbf{quotation marks}  
+\textit{main}: the \textbf{main title} of the boxplot  
+
+### Lab Handout Answer
+\textbf{Similarities:}  
+1. Both distributions are approximately \textbf{symmetric}.  
+2. There are \textbf{no outliers} for both distributions.  
+\textbf{Differences:}  
+1. Median: the median of RT is approximately $40$, while the median of Metacritic is approximately $50$.  
+2. Min: the minimum of RT is approximately above $0$, while the minimum of Metacritic is approximately $20$.  
+3. Max: the maximum of RT is approximately $100$, while the maximum of Metacritic is approximately $90$.  
+4. IQR: the IQR of RT is approximately $60 - 25 = 35$, while the IQR of Metacritic is approximately $60 - 40 = 20$.  
+5. Overall relationship: overall, the Metacritic scores are higher than Rotten tomatoes ("overall" usually means \textbf{median}).  
+
+\newpage
+
+# Optional Parts
+## \textit{tapply()} Function
+Use \textit{tapply()} function to apply a R function on a \textbf{subset} of \textbf{vector}.  
+\textit{tapply()} function is another instance of \textbf{vecorized computation} in R, and it has the same vecorized computation rules:  
+If we apply an operation (a R function here) on a \textbf{vector} (a subset of a vector here), R will apply the function on \textbf{each item} simultaneously and \textbf{individually}.  
+Format: \textit{tapply(target\_vector, group\_vector, function\_name, optional arguments, $\cdots$)}  
+\textbf{Attention:}  
+\textit{target\_vector} is usually a \textbf{quantitative variable}  
+\textit{group\_vector} is usually a \textbf{categorical variable}  
+Use \textit{function\_name} \textbf{only without parentheses} (this only applies for using a R function as an \textbf{argument} in \textit{apply()} family functions, such as \textit{tapply()} here)    
+Recall: \textit{read.csv(file.choose())}, we need to keep the parentheses for \textit{file.choose()} function; we need to type parentheses \textbf{after the function name} when we \textbf{directly} use a function in R  
+```{r}
+tapply(m_new$Budget, m_new$Rating, mean, na.rm = T) #apply the mean function
+tapply(m_new$Budget, m_new$Rating, median, na.rm = T) #apply the median function
+tapply(m_new$Budget, m_new$Rating, sd, na.rm = T) #apply the sd function
+tapply(m_new$Budget, m_new$Rating, IQR, na.rm = T) #apply the IQR function
+```
+
+The usage of \textit{median()} function and \textit{IQR()} function can be found in [Week 2 Lab Code](https://drive.google.com/file/d/1Cf7XlTxzsUM_A3IzDVER8aJViTKdXgNU/view?usp=sharing).  
+
+## Arrangement of Graphs
+Use \textit{par()} function to change the arrangement of plots. 
+Format: \textit{par(mfrow = c(row\_number, column\_number))}  
+Generally, in R, when we need to use a coordinate (row and column), the first number should be \textbf{row}, and the second number should be \textbf{column}.  
+Argument \textit{mfrow} requires a \textbf{vector} of \textbf{row number} and \textbf{column number}  
+Recall: use \textit{c()} function to create a vector  
+```{r}
+par(mfrow = c(2, 1)) # 2 (row) by 1 (column) window 
+hist(m_new$RT, xlim = c(0, 100), main = "Rotten Tomatoes ratings")
+hist(m_new$Metacritic, xlim = c(0, 100), main = "Metacritic ratings")
+par(mfrow = c(1, 1)) #set back to default: mfrow = c(1, 1)
+```
+
+```{r}
+par(mfrow = c(1, 2)) # 1 (row) by 2 (column) window 
+hist(m_new$RT, xlim = c(0, 100), main = "Rotten Tomatoes ratings")
+hist(m_new$Metacritic, xlim = c(0, 100), main = "Metacritic ratings")
+par(mfrow = c(1, 1)) #set back to default: mfrow = c(1, 1)
+```
+
+Recommend to change the arrangement back to \textbf{default} (\textit{mfrow = c(1, 1)}) after displaying the plots, which might avoid some re-arrangement conflicts.  
+
+## \textit{attach()} Function
+Use \textit{attach()} function to attach a dataset (data frame) to the search path (i.e., R Environment).  
+Format: \textit{attach(dataset\_name)}  
+After attaching a dataset, we can \textbf{directly} use the \textbf{variable name} in the dataset to extract the variable.  
+Recall: usually, we need to use \textit{dataset\_name}\$\textit{variable\_name} to extract the variable from the dataset.  
+Attention: \textit{attach()} function might cause \textbf{name conflicts} when there are variables with \textbf{the same name} in the \textbf{R environment} and in the \textbf{dataset}. To avoid this, use \textit{detach(dataset\_name)} after all processing of the dataset is done.   
+```{r, warning = FALSE}
+attach(m_new) #attach the dataset to the environment
+table(Rating) #no need to use m_new$Rating
+mean(Budget, na.rm = T) #no need to use m_new$Budget
+boxplot(RT, Metacritic, #no need to use m_new$RT or m_new$Metacritic
+        names = c("Rotten Tomatoes", "Metacritic"), main = "Review scores")
+detach(m_new) #detach the dataset after all processing
+```
+
+Tips: consider \textit{attach()} and \textit{detach()} as an "inseparable" pair of "brackets" (because the name conflict bugs are EXTREMELY annoying and DIFFICULT to recognize)  
+Once we use the \textit{attach()} function, type \textit{detach()} right after it in a new line, and then put all other codes between them.  
