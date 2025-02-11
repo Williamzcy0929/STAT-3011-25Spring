@@ -124,6 +124,7 @@ What is the probability that a coffee shop is built in either the Art museum or 
 ### Answer
 Let $A$ for building a coffee shop in the art museum and $B$ in the biology library.  
 Note: specify \textbf{what the capital letter means} before solving the math problem (usually use a sentence like: "Let $A$ be the event $\dots$").  
+Note: noticing the phrase "either $\dots$ or $\dots$", we need to find the \textbf{union} event of $A$ and $B$.  
 Since these two events $A$ and $B$ are \textbf{disjoint}, we have $P(A \cap B) = 0$.  
 $P(A \cup B) = P(A) + P(B) - P(A \cap B) = 0.3 + 0.25 - 0 = 0.55$  
 
