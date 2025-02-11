@@ -1,0 +1,425 @@
+---
+title: "Week 4 Lab Code"
+author: "William Zhao"
+date: "2025-02-11"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Introduction to R Markdown (Optional)
+\begin{center}
+{\large THE BEST WAY TO LEARN R MARKDOWN IS TO KEEP PRACTICING} \\
+{\large PRACTICE MAKES PERFECT}
+\end{center}  
+## Create a R Markdown file (.Rmd)
+File - New File - R Markdown
+Specify the \textbf{title}, \textbf{author name}, \textbf{data}, and \textbf{output type} (.html, .pdf, and .doc)  
+
+## Knit to a Readable Document
+Click the \textbf{Knit button} on the top bar of the Editor window.  
+Change the output file type in the pull-down menu.  
+\textbf{Notice}:  
+PDF file requires a \textbf{LaTeX environment} when \textbf{knitting}. Make sure LaTeX has installed before knitting to a PDF file (otherwise, there will be an error).    
+On Windows: run the following code \textbf{once} for the first time using R Markdown  
+```{r, eval = FALSE}
+tinytex::install_tinytex()
+```
+
+This code will automatically install all LaTeX environments required. Once the LaTeX environment is installed, we can knit to a PDF file output and there is no need to run this code again for other R Markdown files.  
+  
+On Mac: install MacTex ([link to install](https://www.tug.org/mactex/mactex-download.html))  
+Even though PDF is the most complex setting for the first time, I still personally recommend PDF format because it is the easiest way to create new pages and separate different questions on different pages.  
+
+## Basic Grammar
+### Headings
+Use # to create different level headings, type a \textbf{space} after the last # before typing the heading content.  
+e.g.:  
+
+# One Pound Sign (#) Makes the Level-1 Heading
+
+## Two Pound Sign (#) Makes the Level-2 Heading
+
+### Three Pound Sign (#) Makes the Level-3 Heading
+
+#### Four Pound Sign (#) Makes the Level-4 Heading
+Level-4 Heading will not be in a seperated line.  
+
+### Normal Text
+Direct typing in the Editor window will create normal texts.  
+To change line, hit the space bar \textbf{twice} after the sentence, then hit [enter]. *two_ _breakes_here*
+To start a new paragraph, include a single completely blank line.
+
+New paragraph here. (there is a blank line above in the source file) 
+
+### Formulas
+Put formulas in a pair of dollar sign ($).  
+Math notations has the same usage as LaTeX. (Google: How to type $\dots$ in LaTeX)  
+A tool for LaTeX beginners: [Text2LaTeX](https://www.text2latex.com)  
+Each math notations start with a \textbf{backslash} (\\)  
+\textbf{Useful Notations:}  
+\textbf{Fraction}: \textit{$\backslash$ frac\{numerator\}\{denominator\}} e.g. $\frac{1}{2}$    
+  
+\textbf{Subscript}:  
+Use underscore(_) to create subscript.  
+\textit{base}_\textit{\{subscript\}}, put all of the subscript in a pair of braces (\{\}) if the subscript contains \textbf{more than one} character. 
+e.g. $x_{1}$, $x_{12}$ 
+If we do not put all of the subscript in the braces, it might looks like: $x_123$ (only the first character is the subscript), while it should be $x_{123}$.    
+  
+\textbf{Superscript} (for complementary set):  
+Use caret (^) to create superscript.  
+\textit{base}^\textit{\{superscript\}}, put all of the subscript in a pair of braces (\{\}) if the subscript contains \textbf{more than one} character.  
+e.g. $x ^ 2$, $e ^ {i \pi}$  
+Use "^ c" for complementary set.  
+e.g. $A ^ c$ denotes $A$ complement   
+If we do not put all of the subscript in the braces, it might looks like: $x ^ 123$ (only the first character is the superscript), while it should be $x ^ {123}$.    
+  
+\textbf{Union}: $\backslash$ \textit{cup} (u for union) e.g. $A \cup B$  
+  
+\textbf{Intersection}: $\backslash$ \textit{cap} e.g. $A \cap B$  
+  
+\textbf{Vertical Bar}: | (shift + \\(|): usually under the delete button on keyboard) e.g. $A | B$  
+
+### R Codes
+Hit \textbf{Crtl + Alt + I} (Windows) / Command + Option + I (Mac) to create a R code chunk.  
+```{r}
+#a R code chunk
+```
+
+R code chunks have \textbf{grey} background.  
+R code is preceded by three backward single quotations and {r} on a line by itself and ended by a line with
+three backward single quotations.  
+Click the "Run Current Chunk" button (greed triangle) to run \textbf{this} chunk.  
+Click the "Run All Chunks Above" button (grey triangle and green horizontal bar) to run \textbf{all} chunks \textbf{above this} chunk (not include this chunk).  
+R Studio will automatically run \textbf{all} chunks from the top to the bottom when \textbf{knitting} to the output file.  
+
+R code chunk has the same usage as the Code Editor in R Script, but the output will show below the chunk when running the chunk of codes or knitting to the output file.
+```{r}
+1 + 6
+```
+
+Same with graphs.  
+```{r}
+vec = c(1, 2, 3, 4, 5)
+plot(vec)
+```
+
+### Other Formatting Grammars
+**bolded text**: put the text in a pair of \textbf{two stars} (**star stat "text" star star**); $\backslash$ \textit{textbf\{text\}} in PDF output  
+*italicized text*: put the text in a pair of \textbf{one star} (*star "text" star*); $\backslash$ \textit{textit\{text\}} in PDF output  
+Create a new page: $\backslash$ \textit{newpage}, only works in PDF output  
+
+\newpage
+
+# Problem 1
+Problem 1 : A university administration is deciding which of two buildings (Art museum, Biology library) on campus to use for a new coffee shop. Suppose that the probability of building a coffee shop in the art museum is $0.30$ and in the biology library is $0.25$. Additionally, building a coffee shop these two buildings are disjoint events.  
+
+## a
+What is the probability that a coffee shop is built in either the Art museum or the biology library?  
+
+### Answer
+Let $A$ for building a coffee shop in the art museum and $B$ in the biology library.  
+Note: specify \textbf{what the capital letter means} before solving the math problem (usually use a sentence like: "Let $A$ be the event $\dots$").  
+Since these two events $A$ and $B$ are \textbf{disjoint}, we have $P(A \cap B) = 0$.  
+$P(A \cup B) = P(A) + P(B) - P(A \cap B) = 0.3 + 0.25 - 0 = 0.55$  
+
+## b
+Given that there will be NO coffee shop in the art museum, what is the probability that the biology library will have a coffee shop?  
+
+### Answer
+Note: noticing the word "given", this should be a \textbf{conditional probability} problem.  
+$A$: there IS a coffee shop in the art museum, so the event: there will be NO coffee shop in the art museum is $A ^ c$.  
+Note: the event \textbf{directly} after the word "given" is the condition.  
+Here, $A ^ c$ is the condition.  
+We need to find $A ^ c \cap B$, which means "there will be no coffee shop in the art museum" ($A ^ c$) \textbf{AND} "there will be a coffee shop in the biology library" ($B$). By Venn diagram (or content comprehension), the event $A ^ c \cap B$ is "there will be a coffee shop in the biology library", which is $B$.  
+$P(B | A ^ c) = \frac{P(A ^ c \cap B)}{P(A ^ c)} = \frac{P(B)}{P(A)} = 0.25 / 0.7 = 0.357$  
+
+## c
+Suppose that in reality, the administrator confused disjoint and independent, and the two events are actually independent. Answer part a) and b) with this correct information.  
+
+### Attention
+Notice that \textbf{disjoint} and \textbf{independent} are different definitions.  
+\textbf{Disjoint}: two events have \textbf{no outcomes in common}.  
+\textbf{Independent}: one occurrence \textbf{does not affect} the probability of another occurrence.  
+
+### Answer
+We know that $A$ and $B$ are independent, so $P(A \cap B) = P(A) \times P(B)$.  
+$P(A \cap B) = 0.3 \times 0.25 = 0.075$  
+
+\textbf{a}  
+$P(A \cup B) = P(A) + P(B) - P(A \cap B) = 0.3 + 0.25 - \mathbf{0.075} = 0.475$  
+
+\textbf{b}  
+Hence $A$ and $B$ are independent, by the definition of independent events, $A ^ c$ and $B$ are independent too (whether A happens or not does not change the probability of B happening or not).  
+For independent events, we have $P(B | A ^ c) = P(B) = 0.25$.  
+
+\newpage
+
+# Problem 2
+On a pop quiz in intro statistics class, there are two problems. Each problem is a multiple choice question with four options (A, B, C, D) and only one is a correct answer. An unprepared student is randomly guessing. We are interested in whether students answer is correct or not for each question. : $C$ for correct and $I$ for incorrect. For instance, an outcome $CI$ means a student answers the first question \textit{correctly} but the second question \textit{incorrectly}. 
+
+## a
+What is the sample space?  
+
+### Answer
+Recall: sample space is the collection of \textbf{all possible outcomes}.  
+Note: If the meanings of events is given in the context, we can directly use them (like this question: $C$ for correct and $I$ for incorrect).  
+$S = \{CC, CI, IC, II\}$  
+
+## b
+What is the probability that a student answers at least one question correctly?   
+
+### Answer
+For each question, the probability of correct $P(C) = \frac{1}{4} = 0.25$. By the complement rule, $P(I) = 1 - P(C) = 1 - \frac{1}{4} = 0.75$ because we only have \textbf{two outcomes}: correct or incorrect.   
+Since the student is randomly guessing, the correctness of one question will not affect the correctness of another question. Thus, the two answers are \textbf{independent}.  
+Note: noticing the "at least" in the context, the question will be easier if using the \textbf{complement rule}.  
+  
+\textbf{Complement Rule Approach}  
+The complement of "answering at least one question correctly" is \textbf{"two quesntions are all answered incorrectly"} (i.e., event $II$).  
+$P(II) = P(I) \times P(I) = 0.75 \times 0.75 = 0.5625$ due to the properties of independent events.  
+Let $X$ be the event that the student answered at least one question correctly; then $X ^ c$ is the event that the student answered two questions incorrectly, which can also represented as $II$.  
+$P(X) = 1 = P(X ^ c) = 1 - P(II) = 1 - 0.5625 = 0.4375$  
+  
+\textbf{Normal Approach}  
+The event that the student answered at least one question correctly contains $3$ outcomes, $CC$, $CI$, and $IC$.  
+Let $X$ be the event that the student answered at least one question correctly, $X = \{CC, CI, IC\}$.  
+Since $CC$, $CI$ and $IC$ cannot happen at the same time, they are \textbf{disjoint}.  
+Due to the properties of independent events, we have:  
+$P(CC) = P(C) \times P(C) = 0.25 \times 0.25 = 0.0625$  
+$P(CI) = P(C) \times P(I) = 0.25 \times 0.75 = 0.1875$  
+$P(IC) = P(I) \times P(C) = 0.75 \times 0.25 = 0.1875$  
+Due to the properties of disjoint events, we have:  
+$P(X) = P(CC) + P(CI) + P(IC) = 0.0625 + 0.1875 + 0.1875 = 0.4375$  
+  
+These two approaches give the same answer, but the \textbf{complement rule approach} is simpler.  
+
+## c
+If a student answered at least one of the answers correctly, that is the probability this student answered both questions correctly.  
+
+### Answer
+The "if" sentence indicates a \textbf{condition}. Thus, we need to compute the \textbf{conditional probability} here.  
+The condition is the event \textbf{directly} after "if", which is the event that the student answered at least one of the answer correctly.  
+Let $X$ be the event that the student answered at least one question correctly.  
+From the previous question, we know that $P(X) = 0.4375$.  
+The event $CC \cap X$ is: "the student answered two question correctly" and "the student answered at least one question correctly", which is also the event that "the student answered two question correctly", i.e., $CC$.  
+$P(CC | X) = \frac{P(CC \cap X)}{P(X)} = \frac{P(CC)}{P(X)} = 0.0625 / 0.4375 = 0.1428$  
+
+\newpage
+
+# Problem 3 (R Problem)
+## Import Dataset
+### \textit{getwd()} and \textit{setwd()} Function
+Working directory is a \textbf{folder} that R is \textbf{directly} connected to.  
+After setting the working directory, it is possible to import data sets directly by its \textbf{file name} if the data file is in the working directory.  
+  
+Use the Graphical User Interface: Session - Set Working Directory - Choose Directory   
+Use R function: \textit{setwd()} (wd stands for working directory)  
+  
+\textbf{getwd() Fuction}  
+Use the function \textit{getwd()} to get the current working directory.  
+"wd" stands for working directory.  
+Format: \textit{getwd()} (recall: () are essential parts of a R function)
+```{r}
+getwd()
+```
+
+\textbf{setwd() Function}  
+Use the function \textit{getwd()} to set the working directory to a specified path.  
+Format: \textit{setwd("working/directory/path")}  
+Use the \textbf{a pair of quotation marks} to quote the \textbf{path} in the \textbf{parentheses}.  
+```{r}
+setwd("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 4")
+```
+\textit{setwd()} function will set the working directory to the \textbf{latest} path when running the command \textit{setwd()} for more than once. 
+
+### Import Dataset from .csv Files
+Use \textit{read.csv()} to import a dataset from \textbf{.csv} files  
+\textbf{Approaches}  
+Use the file name (under the same working directory)  
+Use the absolute path  
+Use the URL  
+Use \textit{file.choose()} method  
+```{r, eval = FALSE}
+tor = read.csv("Tornadoes Data.csv") #with quotation marks
+tor = read.csv("/.../Tornadoes Data.csv.csv") #with quotation marks
+tor = read.csv("http://url/to/the/file/movies2009.csv")
+tor = read.csv(file.choose()) #no quotation marks
+```
+
+Optional argument: \textit{header} (default: \textit{TRUE} or \textit{T})  
+header = T: consider the first row in the dataset as the \textbf{column names}  
+
+### Import Dataset from .txt Files
+Use \textit{read.delim()} function to read a \textbf{tab-separated-value} file (usually \textbf{.txt} or \textbf{.tsv}) from the specified path.  
+Note: csv: comma-separated-value  
+\textit{read.xxx()} family have similar formats (file path, optional arguments, etc.).  
+\textbf{Approaches}  
+Use the file name (under the same working directory)  
+Use the absolute path  
+Use the URL  
+Use \textit{file.choose()} method  
+```{r, eval = FALSE}
+tor = read.delim("Tornadoes Data.txt") #with quotation marks
+tor = read.delim("/.../Tornadoes Data.csv.txt") #with quotation marks
+tor = read.delim("http://url/to/the/file/movies2009.txt")
+tor = read.delim(file.choose()) #no quotation marks
+```
+
+```{r, include = FALSE}
+tor = read.csv("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 4/Tornadoes Data.csv")
+```
+
+## 1
+## \textit{table()} Function
+Use \textit{table()} function to get the \textbf{frequency table}.  
+Frequency: the number of times of appearance for each possible value of a variable  
+Format: \textit{table(variable\_name)}, use \textbf{variable names} rather than dataset names here  
+  
+Recall: use \textit{\$} to extract a variable from a dataset  
+Format: \textit{dataset\_name\$variable\_name}  
+```{r}
+#target variable: Fujita (Fuj in the dataset)
+table(tor$Fuj)
+```
+
+### Answer
+$0$ is the most common Fujita scale.  
+
+## Compute the Proportion
+Since the return result of \textit{table()} function is a \textbf{vector}, we can apply the vectorized computation rule on it and compute the proportion for all items.  
+Use \textit{round()} function to round decimals.  
+Format: \textit{round(item, $n$)}, where $n$ is the decimal place
+```{r}
+round(table(tor$Fuj) / 1371, 3) #round the proportion to three decimal digits
+```
+
+## 2
+```{r}
+#target variable: Area
+table(tor$Area)
+```
+
+### Answer
+C (Central) area has the most tornadoes.  
+
+## 3
+### \textit{ifelse()} Function
+Use \textit{ifelse()} function as a "filter"  
+Format: \textit{ifelse(judgement\_statement, true\_result, false\_result)}  
+\textit{judgement\_statement}: a condition that might be \textbf{true} or \textbf{false}  
+\textit{true\_result}: if the condition is met, the return value of the function  
+\textit{false\_result}: if the condition is not met, the return value of the function  
+```{r,results = "hide"}
+tor$Sig = ifelse(tor$Fuj >= 2, "Yes", "No") 
+#create a new variable called Sig in the dataset tor
+#if tor$Fuj >= 2, the function will return "Yes", and then it is stored in the variable Sig
+#if tor$Fuj < 2, the function will return "No", and then it is stored in the variable Sig
+tor$Sig #view the values of the variable Sig
+```
+
+## 4
+### \textit{table()} Function for Contingency Table
+One argument \textit{table(vector\_name)}: \textbf{frequency} table  
+Two arguments \textit{table(vector\_name1, vector\_name2)}: \textbf{contingency} table (row, column)  
+Note: the \textbf{first} vector is the \textbf{row} in the contingecy table; the \textbf{second} vector is the \textbf{column} in the contingency table  
+```{r}
+#target variables: Sig, Area
+table(tor$Sig, tor$Area)
+#row: Sig
+#column: Area
+```
+
+\textbf{Frequency Tables}  
+```{r}
+#target variable: Sig
+table(tor$Sig)
+```
+
+```{r}
+#target variable: Area
+table(tor$Area)
+```
+
+\textbf{Sample Size (Number of Elements in $S$)}  
+```{r}
+1126 + 237 #there are missing values in variable Fuj
+243 + 127 + 71 + 36 + 230 + 194 + 134 + 150 + 186 
+```
+
+We will use $1363$ as the sample size, i.e., number of outcomes in the sample space $S$.  
+  
+\textbf{a}  
+Let $E$ denote the events that the tornado made the touchdown in East Central Minnesota and $T$ denote that the tornado is a significant tornado. Using the data above to estimate the probabilities $Pr(E)$ and $Pr(T)$.
+```{r}
+127 / 1363
+```
+
+$Pr(E) = \frac{\text{number of E}}{\text{total number of tornadoes}} = 127 / 1363 = 0.093$  
+
+```{r}
+237 / 1363
+```
+
+$Pr(T) = \frac{\text{number of sigigicant (Yes)}}{\text{total number of tornadoes}} = 237 / 1363 = 0.174$  
+  
+\textbf{b}  
+Estimate the probability that a Minnesota tornado made the touchdown in East Central Minnesota and was significant.  
+Note: noticing the "and" in the context, we need to find the \textbf{intersection} of these two events $E$ and $T$.  
+Given a \textbf{contingency table}, we could find the number of outcomes in an \textbf{intersection event} by checking both the \textbf{row} and \textbf{column} to find the number in the \textbf{intersection cell}.  
+```{r}
+table(tor$Sig, tor$Area)
+```
+
+The number in the intersection cell of $E$ and $T$ (Yes) is $31$, meaning that the number of elements in the intersection event $E \cap T$ is $31$.  
+```{r}
+31 / 1363
+```
+
+$Pr(E \cap T) = \frac{\text{number of E and T}}{\text{total number of tornadoes}} = 31 / 1363 = 0.023$  
+  
+\textbf{c}  
+Estimate the probability that a Minnesota tornado made the touchdown in East Central Minnesota or was significant (or both).  
+Note: noticing the word "or" and the "(or both)" part, we need to find the \textbf{union} of these two events $E$ and $T$.  
+By the \textbf{General Addition Rule}, we have:  
+```{r}
+127 / 1363 + 237 / 1363 - 31 / 1363
+```
+
+$Pr(E \cup T) = Pr(E) + Pr(T) - Pr(E \cap T) = 127 / 1363 + 237 / 1363 - 31 / 1363 = 333 / 1363 = 0.244$  
+(when we have more than one fractions in the equation, keep using fractions to compute until the last step)  
+  
+\textbf{d}  
+Based on your answers from parts a). and b)., are events E and T independent? Please use statistical reasoning and a formula to justify your answer.  
+Recall: $A$ and $B$ are independent if and only if when $P(A \cap B) = P(A) \times P(B)$  
+Based on previous calculation, we have:  
+$Pr(E \cap T) = 31 / 1363 = 0.023$  
+$Pr(E) \times Pr(T) = 127 / 1363 \times 237 / 1363 = 0.093 \times 0.174 = 0.016$  
+$0.023 \neq 0.016$  
+Thus, we have $Pr(E \cap T) \neq Pr(E) \times Pr(T)$.  
+\textbf{(statistical reasoning, make sure to include the steps above)}  
+Thus, event $E$ and $T$ are not independent.  
+  
+\textbf{e}  
+Based on your answers from parts a). and b)., are events E and T disjoint? Justify your response.  
+Recall: $A$ and $B$ are disjoint if and only if when $Pr(A \cap B) = 0$  
+Based on previous calculation, we have:  
+$Pr(E \cap T) = 31 / 1363 = 0.023 \neq 0$  
+Thus, we have $Pr(E \cap T) \neq 0$  
+\textbf{(statistical reasoning, make sure to include the steps above)}  
+Thus, event $E$ and $T$ are not disjoint.  
+  
+\textbf{f}  
+Estimate the probability that a Minnesota tornado was significant given that it had made the touchdown in East Central Minnesota. Comment on whether East Central Minnesota has a higher proportion of significant tornadoes compared to the whole state of Minnesota.  
+Note: noticing the word "given", we need to compute the \textbf{conditional probability}.  
+The condition event is the event \textbf{directly} after the "given", which is $E$.  
+Based on previous calculation, we have:  
+```{r}
+31 / 127
+```
+
+$Pr(T | E) = \frac{Pr(T \cap E)}{Pr(E)} = \frac{31 / 1363}{127 / 1363} = \frac{31}{127} = 31 / 127 = 0.244$  
+Since this probability is greater than that of the whole state of Minnesota $Pr(T) = 0.174$, the tornadoes in East Central Minnesota are more likely to be significant compared to that of the whole Minnesota.  
