@@ -1,0 +1,540 @@
+---
+title: "Week 5 Lab Code"
+author: "Section 019"
+date: "2025-02-19"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Problem 1 
+You are watching two items posted for sale on eBay and bid $30 for the first and $20 for the second item. You estimate that you are going to win the first bid with probability 0.1 and the second bid with probability 0.2, and the probability of winning both 0.04. Let X denote the random variable denoting the total amount of money you will spend on the two items.   
+
+## a
+List the sample space of all possible outcomes of winning or losing the two bids (there are 4 possible outcomes total). Use W for winning, L for losing. For instance, W1L2 represents ’winning the first bid but losing the second bid’).  
+
+### Answer
+Note here the order **matters** (e.g., W1L2 and W2L1 are not the same).  
+For each bid, we have $2$ outcomes: W or L.  
+Thus, we have $2 \times 2 = 4$ outcomes for the two bids scenario.  
+$S = \{\text{W1W2}, \text{W1L2}, \text{L1W2}, \text{L1L2}\}$  
+
+## b
+Find the probability of each outcome in the sample space.  
+
+### Answer
+Let $A$ be the event of winning the first bid, $B$ be the event of winning of the second bid.  
+Notice: The question **does not** mention the independence of $A$ and $B$. In this case, we cannot use $P(A \cap B) = P(A) \times P(B)$ to compute $P(A \cap B)$ (if we check the number, they are also not equal).  
+$P(\text{W1W2}) = P(A \cap B) = 0.2 \times 0.2 = 0.04$  
+$P(\text{W1L2}) = P(A \cap B ^ {c}) = P(A) - P(A \cap B) = 0.1 - 0.04 = 0.06$ (by **partition rule** $P(A) = P(A \cap B) + P(A \cap B ^ {c})$)  
+$P(\text{L1W2}) = P(A ^ {c} \cap B) = P(B) - P(A \cap B) = 0.2 - 0.04 = 0.16$ (by **partition rule**)  
+  
+
+$P(\text{L1L2}) = P(A ^ {c} \cap B ^ {c}) = 1 - P(A \cup B)$ (by **complement rule** or **De Morgan's Law**)    
+$P(A \cup B) = P(A) + P(B) - P(A \cap B) = 0.1 + 0.2 - 0.04 = 0.26$ (by **general addition rule**)  
+$P(\text{L1L2}) = 1 - 0.26 = 0.74$.  
+
+## c
+For each outcome in the sample space, identify the total amount of money you will spend. For instance, for outcome  W1L2 (if you win the first and lose the second bid), the total amount of money you will spend is $30 ($30 for the first item +$0 for the second item).  
+
+### Answer
+Let $X$ be the total amount of spending, and $x$ be the possible values of $X$.  
+$x = 0, 20, 30, 50$  
+  
+Explanation:  
+$0$: $\text{L1L2}$  
+$20$: $\text{L1W2}$  
+$30$: $\text{W1L2}$  
+$50$: $\text{W1W2}$  
+
+## d
+Suppose you could repeatedly bid on the two items over and over. Let X be the random variable that represents the total amount you will spend after each set of two bids. Based on your answer from part b) and c) (all possible values you could spend and its associated probability), find the probability distribution of X. For instance, x=$30 when outcome W1L2 occurs. Hence P(X=30) = P(W1L2)=0.06.  
+
+### Answer
+Match each spending ($X = x$) with each event (e.g. $\text{W1W2}, \text{L1L2}$ etc.)  
+$P(X = 0) = P(\text{L1L2}) = 0.74$  
+$P(X = 20) = P(\text{L1W2}) = 0.16$  
+$P(X = 30) = P(\text{W1L2}) = 0.06$  
+$P(X = 50) = P(\text{W1W2}) = 0.04$  
+
+## e
+Modify the R command below to find the expected value of X. If you are copying and pasting, you may have to retype special characters such as comma " , " 
+
+### Answer
+Recall: $E(X) = \sum_{i = 1} ^ {n} x_i \times P(X = x_i)$
+**Computation Approach:**  
+```{r}
+0 * 0.74 + 20 * 0.16 + 30 * 0.06 + 50 * 0.04
+```
+
+$E(X) = 0 \times 0.74 + 20 \times 0.16 + 30 \times 0.06 + 50 \times 0.04 = 7$  
+
+\newpage
+  
+**R Approach** (Vectorized Computation):  
+Recall: R is a vectorized programming language. If we apply an operation on a **vector** (created by *c()* function or a variable extracted from a dataset), R will apply the same operation on **each element** in the vector simultaneously.  
+If vector $a = (a_1, a_2, \cdots, a_n)$ and vecor $b = (b_1, b_2, \cdots, b_n)$ have the **same** length, using $a * b$ will create a new vector $(a_1 * b_1, \, a_2 * b_2, \, \cdots, \, a_n * b_n)$.  
+Note: 
+1. This only works for vectors with the **same length**.  
+2. The order of each vector **matters**, and R will only apply the operation on elements **at the same place** in $a$ and $b$.  
+
+### *sum()* Function
+Use *sum()* function to compute the sum of a **vector**  
+Format: *sum(vector / vector_name)*  
+
+```{r}
+#recall: use c() function to create a vector
+
+#create x vector: amount of money spending
+x = c(0, 20, 30, 50)
+
+#create p vector: probability of each x, p = P(X = x)
+#each p is corresponding to each x at the same place in the x vector
+p = c(0.74, 0.16, 0.06, 0.04)
+
+x * p #(0 * 0.74, 20 * 0.16, 30 * 0.06, 50 * 0.04)
+
+#expected value is the sum of the vector x * p
+sum(x * p)
+```
+
+\newpage
+
+# Problem 2 *pnorm()* and *qnorm()* Functions
+\begin{center}
+{\large Attention: We Will Use These Two Functions \textbf{Many Many Times} Later This Semester} 
+\end{center}  
+
+Standard normal distribution: $Z$ is the normal random variable with mean of 0 and standard deviation 1. $Z\sim N(0, 1)$.  
+ 
+* R command pnorm(z) returns $P(Z\leq z)$  
+* ex) pnorm(1) gives $P(Z\leq 1)$ (draw standard normal distribution curve then mark $z=1$ on the horizontal axis then shade the area that represents $P(Z\leq 1)$)  
+ 
+* R command qnorm(p) returns z such that $P(Z\leq z)$  
+ex) qnorm(.5) gives $z$ value such that $P(Z\leq z)=0.5$ (z value whose left tailed area = 0.5)  
+
+Takeaways: If we use the **default** version of *pnorm()* and *qnorm()* functions, they are designed for **standard normal distribution** ($Z \sim N(0, 1)$ with mean $\mu = 0$, variance $\sigma ^ 2 = 1$), i.e., if the actural distribution is not normal, we need to **standardize** it first. ($Z$ usually means standard normal distribution)   
+  
+In the questions below, we will only use **standard normal distribution**, and we will discuss more about general normal distribution and standardization later this semester.  
+
+## *pnorm()* Function
+Use *pnorm()* function to get $P(Z \leq z)$ for a **standard normal distribution**.  
+*pnorm()* function will return a **probability** (p stands for probability) corresponding to a given $z$-value (quantile).  
+Format: *pnorm(z)* (return $P(Z \leq z)$)  
+**Attention**:  
+If we do not add any **optional argument**, the vanilla *pnorm(z)* function will return the **left side probability** ($P(Z < z)$ or $P(Z \leq z)$) for a **standard normal distribution**.  
+If we want to compute the right side probability (e.g., $P(Z > z)$ or $P(Z \geq z)$), we need to use $1 - \textit{pnorm(z)}$.  
+
+## *qnorm()* Function
+Use *qnorm()* function to get the corresponding $z$-value of $P(Z \leq z) = p$ given the probability $p$ for a **standard normal distribution**.  
+*qnorm()* function will return a $z$-value (percentile or quantile, q stands for quantile) corresponding to a given probability.  
+Format: *qnorm(p)* (return $z$ such that $P(Z \leq z) = p$)  
+**Attention**:  
+If we do not add any **optional argument**, the vanilla *qnorm(p)* function will consider the probability $p$ the **left side probability**, i.e., compute the $z$-value such that $P(Z < z)$ or $P(Z \leq z) = p$.  
+
+\newpage
+
+## a) $P(Z \leq 0.9)$  
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+```
+
+### Answer
+Find $z = 0.9$ on the $x$-axis first.  
+Find which side of probability to use.  
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+
+x_high = seq(-3, 0.9, length.out = 200)
+y_high = dnorm(x_high, 0, 1)
+polygon(x = c(-3, x_high, 0.9),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+$P(Z \leq 0.9)$ is a **left side probability** ($\leq$).  
+For **probability** problem, we use *pnorm()* (p for probability) function.  
+For **left side probability**, we use the default *pnorm()* function only (no need to add $1 -$).  
+```{r}
+pnorm(0.9)
+```
+
+\newpage
+
+## b) Find the z-value that marks the 90th percentile of the standard normal distribution
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+```
+
+### Answer
+Find which side of probability to use.  
+Find the corresponding $z$-value on the $x$-axis with the left side probability $= 90\%$.  
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+
+x_high = seq(-3, 0.9, length.out = 200)
+y_high = dnorm(x_high, 0, 1)
+polygon(x = c(-3, x_high, 0.9),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+The question is asking about **percentile**, where the corresponding probability is $90\%$.  
+The probability given by **percentile** is the **left side probability**.  
+For **z-value** problem, we use *qnorm()* (q for quantile, another name for percentile) function.  
+For **left side probability**, we use the default *qnorm* function (no need to compute the left side probability by ourselves) only.  
+```{r}
+qnorm(0.9)
+```
+
+\newpage
+
+## c) $P(Z > 0.5)$
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+```
+
+### Answer
+Find $z = 0.5$ on the $x$-axis first.  
+Find which side of probability to use.  
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+
+x_high = seq(0.5, 3, length.out = 200)
+y_high = dnorm(x_high, 0, 1)
+polygon(x = c(0.5, x_high, 3),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+$P(Z > 0.5)$ is a **right side probability** ($>$).  
+For **probability** problem, we use *pnorm()* (p for probability) function.  
+For **right side probability**, we use $1 -$ *pnorm()* function (default *pnorm()* function returns the left side probability).  
+```{r}
+1 - pnorm(0.5)
+```
+
+\newpage
+
+## d) $P(-1.5 < Z < 0.5)$
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+```
+
+### Answer
+Find $z_1 = -1.5$ and $z_2 = 0.5$ on the $x$-axis first.  
+Find the intersection and think about how to represent it ($P(Z < 0.5) - P(Z \leq -1.5)$).  
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+
+x_high = seq(-1.5, 0.5, length.out = 200)
+y_high = dnorm(x_high, 0, 1)
+polygon(x = c(-1.5, x_high, 0.5),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+
+x_high = seq(-3, -1.5, length.out = 200)
+y_high = dnorm(x_high, 0, 1)
+polygon(x = c(-3, x_high, -1.5),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.2),
+        border = NA)
+```
+
+For the lower & upper bound question, we usually compute the **difference** between two **left side probabilities**.  
+$P(Z < \text{upper bound}) - P(Z < \text{lower bound})$  
+For **probability** problem, we use *pnorm()* (p for probability) function.  
+For **left side probability**, we use the default *pnorm()* function only (no need to add $1 -$).  
+```{r}
+pnorm(0.5) - pnorm(-1.5)
+```
+
+\newpage
+
+## Optional Arguments (Optional for This Lab)
+
+### Arguments *mean* and *sd*
+Extend the *pnorm()* and *qnorm()* functions for **all** normal distribution with arbitrary $\mu$ and $\sigma ^ 2$ (not only for **standard normal distribution** with $\mu = 0$ and $\sigma ^ 2 = 1$).  
+Default (if we do not specify them): *mean $= 0$*, *sd $= 1$* (standard normal distribution)  
+Format: *pnorm(z, mean = $\mu$, sd = $\sigma$)* for the normal distribution $N(\mu, \sigma ^ 2)$ with mean $\mu$ and variance $\sigma ^2$ (standard deviation $\sigma$).  
+e.g. Compute $P(X < 50)$, where $X \sim N(40, 10 ^ 2)$  
+```{r}
+pnorm(50, mean = 40, sd = 10)
+```
+  
+If we use the $z$-score:  
+$z = \frac{x - \mu}{\sigma} = \frac{50 - 40}{10} = 1$  
+```{r}
+pnorm(1)
+```
+
+These two approaches will provide the same answer.  
+
+### Argument *lower.tail*
+Extend *pnorm()* and *qnorm()* functions for right side ($>$ or $\geq$) probability.  
+Default (R will automatically use this if we do not change this argument): *lower.tail = T* or *TRUE* (lower tail stands for the **left side probability**)  
+If we want to compute or use the **right side probability**, we need to set *lower.tail = F* or *FALSE*.  
+  
+**Format**:  
+*pnorm(z, lower.tail = F)*: $P(Z > z)$ or $P(Z \geq z)$, the same outcome as $1 - \textit{pnorm(z)}$  
+*qnorm(p, lower.tail = F)*: $z$-value such that $P(Z > z)$ or $P(Z \geq z) = p$  
+  
+e.g. Compute $P(Z > 0.5)$ (the same question as Problem 2(c))  
+```{r}
+pnorm(0.5, lower.tail = F)
+```
+
+If we do not use *lower.tail = F*, we need to use $1 - \textit{pnorm(0.5)}$
+```{r}
+1 - pnorm(0.5)
+```
+
+These two approaches will provide the same answer.  
+  
+**Attention**:  
+Use only **ONE** approach each time: $1 - \textit{pnorm(z)}$ **OR** *pnorm(z, lower.tail = F)*  
+DO NOT use $1 - \textit{pnorm(z, lower.tail = F)}, it will give the same output as *pnorm(z)* ("double negation")  
+
+\newpage
+
+# Problem 3 
+Use pnorm() command to find what percentage of the distribution is within 1 standard deviation from the mean in the standard normal distribution? Is it approximately 68%?  
+
+### Answer
+For a **standard normal distribution**, the interval within $1$ standard deviation from the mean is $[0 - 1, 0 + 1] = [-1, 1]$.  
+The percentage of distribution is $P(-1 \leq Z \leq 1)$ (we use $Z$ for standard normal distribution).  
+  
+$P(-1 \leq Z \leq 1) = P(Z \leq 1) - P(Z < -1)$ (or $P(Z \leq -1)$) $= \textit{pnorm(1)} - \textit{pnorm(-1)}$  
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 0, sd = 1),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2)
+
+x_high = seq(-1, 1, length.out = 200)
+y_high = dnorm(x_high, 0, 1)
+polygon(x = c(-1, x_high, 1),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+
+x_high = seq(-3, -1, length.out = 200)
+y_high = dnorm(x_high, 0, 1)
+polygon(x = c(-3, x_high, -1),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.2),
+        border = NA)
+```
+
+```{r}
+pnorm(1) - pnorm(-1)
+```
+
+The output of \textit{pnorm(1)} - \textit{pnorm(-1)} is approximately $0.68$ ($68\%$).  
+
+### Extra Exercise
+$2$ standard deviation from the mean:  
+```{r}
+pnorm(2) - pnorm(-2)
+```
+
+$3$ standard deviation from the mean:  
+```{r}
+pnorm(3) - pnorm(-3)
+```
+
+Recall: the $68-95-99.7$ rule
+The percentage of **standard normal distribution** within $1$ standard deviation from the mean is approximately $68\%$.  
+The percentage of **standard normal distribution** within $2$ standard deviation from the mean is approximately $95\%$ ($95.4\%$).    
+The percentage of **standard normal distribution** within $3$ standard deviation from the mean is approximately $99.7\%$.  
+
+\newpage
+
+# Problem 4 (Importing Dataset Review)
+## Step 1: Import Dataset
+```{r, include = FALSE}
+survey = read.csv("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Survey S25.csv", header = T)
+```
+
+**Attention**:  
+If we want to import and **store** a dataset in R (rather than only view it), we need to create an **object** to store it.  
+Use "dataset_name" = read_function like these examples:  
+```{r, eval = FALSE}
+dataset = read.csv("...") #if the dataset is a .csv file
+dataset = read.delim("...") #if the dataset is a .txt file
+```
+
+If we only use the *read_function*, R will import the dataset and only show it (we cannot deal with it or extract variables from it).  
+DO NOT use the following codes to import dataset:  
+```{r, eval = FALSE}
+read.csv("...") #this will not store the dataset in R environment
+```
+
+### From Working Directory
+If the data file is in the same folder as the working directory, we can directly use its name to import.  
+Put the file name in a pair of **quotation marks** (e.g. "file_name").
+```{r}
+getwd()
+```
+
+If the data file is in the folder "/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 5", we can use the following codes:  
+```{r, eval = FALSE}
+#put the file name in a pair of quotation marks
+survey = read.csv("Survey S25.csv") #for .csv file
+survey = read.delim("Survey S25.txt") #for .txt file
+```
+  
+How to set working directory: steps shown in the lab handout  
+If we are using **R Markdown**, the working directory will automatically be the folder **containing the .Rmd file** (no need to set the working directory manually).  
+
+### From Any Local Location
+Use *file.choose()* method and choose the data file in the pop-up window (highly recommended method).  
+When using *file.choose()* method, **DO NOT** put it in a pair of quotation marks, and remember the parentheses after the method name (file.choose, without parenthese, will not work).  
+```{r, eval = FALSE}
+#no quotation marks, include the parentheses
+survey = read.csv(file.choose()) #for .csv file
+survey = read.delim(file.choose()) #for .txt file
+```
+
+## Step 2: Examine Dataset
+Use *names()* function to get **variable names** in a dataset.  
+```{r}
+names(survey)
+```
+
+Use *head()* function to show the first **six** lines of the dataset.  
+```{r}
+head(survey)
+```
+
+Use *str()* function to get the **structure** (str is the short of structure) of the dataset.  
+```{r}
+str(survey)
+```
+
+## Step 3: Make Frequency Table
+Use *table* function to make **frequency table** for a **categorical variable**.  
+Recall: Use *$* to extract a variable from a dataset.  
+```{r}
+table(survey$theater) #frequency table for variable: theater
+```
+
+Use *sum()* function to compute the **sum** of a vector.  
+Recall: Problem 1 - compute the expected value  
+For frequency table, we can use *sum()* function to compute the **sample size**.  
+```{r}
+sum(table(survey$theater))
+```
+
+Compute the proportion by **vectorized computation**  
+Reminder: proportion is a **ratio** or **fraction** ($\frac{\text{\# of interested elements}}{\text{sample size}}$)  
+```{r}
+table(survey$theater) / 289
+```
+
+Round the proportion  
+Use *round()* function to round decimals to a fixed number of digits  
+```{r}
+round(table(survey$theater) / 289, 3) #round proportions to 3rd decimal places
+```
+
+## Step 4: Convert "None" and "4 or More" to Numbers
+Use *typeof()* function to check the **type** (i.e., categorical / quantatitive) of a variable.  
+```{r}
+typeof(survey$theater)
+```
+
+"character" means **categorical variable**. In this case, some R functions designed for quantitative variable cannot be used (e.g. *hist()*, *mean()*, etc.).  
+```{r, eval=FALSE}
+hist(survey$theater)
+mean(survey$theater)
+```
+If we run these codes, R will give errors like:  
+* Error in hist.default(survey$theater) : 'x' must be numeric  
+* Warning: argument is not numeric or logical: returning NA  
+
+To solve this issue, we need to convert the variable *theater* into **quantatitive** variable.  
+Create a new quantitative vector “theater.num” such that  
+* If a student's response is “None”, assign it a value of 0.  
+* If “4 or more” assign it a value of 4.  
+* Otherwise, keep the original value.    
+
+Since there are two conditions ("None" and "4 and more"), we need to use a **nested** if structure.  
+*ifelse(logic statement, outcome if true, if false (check another logic statment, outcome if true, outcome if false))*  
+```{r}
+#create a new variable called theater.sum
+#store the outcome of the nested if structure
+theater.num = ifelse(survey$theater == "None", 0, 
+                     ifelse(survey$theater == "4 or more", 4, survey$theater))
+```
+
+Use *typeof()* function to check the type again.  
+```{r}
+typeof(theater.num)
+```
+
+"character" means the variable *theater.num* is also a **categorical variable**, because we create this variable by using another **categorical variable** *theater* and R will consider them share the type.  
+
+Convert the type into quantitative variable.  
+Use *as.integer()* function to convert a **"look likely"** number into an **"actual"** number.  
+We will use the *as.integer()* function to convert the categorical variable *theater.num* into **quantitative variable**.  
+```{r}
+theater.num = as.integer(theater.num)
+```
+
+Use *typeof()* function to check the type again.  
+```{r}
+typeof(theater.num)
+```
+
+"integer" means the variable *theater.num* is a **quantitative variable** (usually **discrete**).  
