@@ -1,0 +1,584 @@
+---
+title: "Week 6 Lab Code"
+author: "Section 019"
+date: "2025-02-25"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Problem 1
+In the United States, the mean birth weight for boys is $3.41$ kg , with a standard deviation of $0.55$ kg. (Source: cdc.com.) Assuming that the distribution of birth weight is normal, answer the following questions using pnorm(), qnorm() command.  
+
+## a
+What is the z-score for a baby boy that weighs $1.5$ kg (defined as extremely low birth weight)? Interpret this z-score. What proportion of baby boys in the United States are born with low birth weight? Use pnorm(z).  
+
+### Answer
+Recall: for an observed value $X = x$, the formula for z-score is $z = \frac{x - \mu}{\sigma}$.    
+Here, the observed value $x = 1.5$, mean $\mu = 3.41$, standard deviation $\sigma = 0.55$.  
+Plugging these numbers in, we have:  
+```{r}
+# (x - mu) / sigma
+(1.5 - 3.41) / 0.55
+```
+
+\begin{align*}
+z &= \frac{x - \mu}{\sigma} \\
+& = \frac{1.5 - 3.41}{0.55} \\
+& = -3.472727
+\end{align*}  
+
+**Interpretation**:  
+The observed value $1.5$ kg is approximately $3.47$ standard deviations **below** (since the z-score is negative) the mean, which can be considered an extremely small outlier (since $\lvert z \rvert = 3.472727 > 3$).  
+Notice: A **negative** z-score is usual, it means the observed value is **below the mean**. "Unusual" typically means "outlier", i.e., $\lvert z \rvert > 3$.  
+
+\newpage
+
+The word "proportion" means this is a **proportion** or **probability** question (use *pnorm()*).  
+Notice the word "below", it indicates that we need to compute $P(X < 1.5)$ (left side probability).    
+  
+**Three Steps for Probability Questions**:  
+**Step 1**: Draw a density curve and find which side of probability to use.  
+```{r, echo = FALSE}
+par(mfrow = c(1, 2))
+
+curve(dnorm(x, mean = 3.41, sd = 0.55),
+      from = 0, to = 7,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2,
+)
+
+x_high = seq(0, 1.5, length.out = 200)
+y_high = dnorm(x_high, mean = 3.47, sd = 0.55)
+
+polygon(x = c(0, x_high, 1.5),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+
+curve(dnorm(x, mean = 3.41, sd = 0.55),
+      from = 0, to = 7,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2,
+      ylim = c(0, 0.001)
+)
+
+x_high = seq(0, 1.5, length.out = 200)
+y_high = dnorm(x_high, mean = 3.41, sd = 0.55)
+
+polygon(x = c(0, x_high, 1.5),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+
+par(mfrow = c(1, 1))
+```
+
+We will use the **left side** probabilty since the inequlity sign is **<**.  
+  
+**Step 2**: Convert $x$ into z-score  
+We have already done this step, where $z = -3.47$.      
+Recall: If $X \sim Z(\mu, \sigma)$, $P(X < x) = P(Z < z)$, where $z = \frac{x - \mu}{\sigma}$ is the z-score of $x$.  
+$P(X < 1.5) = P(Z < -3.47)$  
+
+**Step 3** Compute the probability (or proportion)  
+For probability (or proportion) questions, we use *pnorm()* function.  
+Recall: The default *pnorm* function is designed for **standard normal distribution**, where we should use z-score. *pnorm(z)* will return $P(Z < z)$.  
+```{r}
+pnorm(-3.47)
+```
+
+About $0.0002602292$ ($0.02602292 \%$) of baby boys in the United States are born with a low birth weight.  
+
+\newpage
+
+## b
+Typically, birth weight is between $2.5$ kg and $4.0$ kg. Find the probability a baby boy is born with typical birth weight. Use pnorm(     , mean = 3.41      , sd = 0.55  )  
+
+### Arguments *mean* and *sd*
+Extend the *pnorm()* and *qnorm()* functions for **all** normal distribution with arbitrary $\mu$ and $\sigma$ (not only for **standard normal distribution** with $\mu = 0$ and $\sigma = 1$).  
+Default (if we do not specify them): *mean $= 0$*, *sd $= 1$* (standard normal distribution)  
+Format: *pnorm(z, mean = $\mu$, sd = $\sigma$)* for the normal distribution $N(\mu, \sigma)$ with mean $\mu$ and standard deviation $\sigma$.  
+
+### Answer
+The word "probability" means this is a **probability** question (use *pnorm()*).  
+Between $2.5$ and $4.0$ kg means we want to compute $P(2.5 < X < 4.0) = P(X < 4.0) - P(X < 2.5)$.  
+
+**Step 1**: Draw a density curve and find which side of probability to use.  
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 3.41, sd = 0.55),
+      from = 0, to = 7,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2,
+)
+
+x_high = seq(2.5, 4, length.out = 200)
+y_high = dnorm(x_high, mean = 3.41, sd = 0.55)
+
+polygon(x = c(2.5, x_high, 4),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+
+x_high = seq(0, 2.5, length.out = 200)
+y_high = dnorm(x_high, 3.41, 0.55)
+polygon(x = c(0, x_high, 2.5),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.2),
+        border = NA)
+```
+
+Since we extend the *pnorm()* function to all kinds of normal distributions, there is no need to do **Step 2** (convering into z-score).  
+
+**Step 3**: Compute the probability  
+```{r}
+pnorm(4.0, mean = 3.41, sd = 0.55) - pnorm(2.5, mean = 3.41, sd = 0.55)
+```
+
+\newpage
+
+## c
+Matteo weighs 3.6 kg at birth. What proportion of baby boys are heavier than Matteo?  
+Use pnorm(    , mean =3.41, sd=0.55, lower.tail=      )  
+
+### Argument *lower.tail*
+Extend *pnorm()* and *qnorm()* functions for right side ($>$ or $\geq$) probability.  
+Default (R will automatically use this if we do not change this argument): *lower.tail = T* or *TRUE* (lower tail stands for the **left side probability**)  
+If we want to compute or use the **right side probability**, we need to set *lower.tail = F* or *FALSE*.  
+  
+**Format**:  
+*pnorm(z, lower.tail = F)*: $P(Z > z)$ or $P(Z \geq z)$, the same outcome as $1 - \textit{pnorm(z)}$  
+*qnorm(p, lower.tail = F)*: $z$-value such that $P(Z > z)$ or $P(Z \geq z) = p$  
+
+### Answer
+The word "proportion" means this is a proportion or **probability** question (use *pnorm()*).  
+Notice the word "heavier", it indicates that we need to compute $P(X > 3.6)$ (right side probability).    
+
+**Step 1**: Draw a density curve and find which side of probability to use.  
+```{r, echo = FALSE}
+curve(dnorm(x, mean = 3.41, sd = 0.55),
+      from = 0, to = 7,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      lwd = 2,
+)
+
+x_high = seq(3.6, 7, length.out = 200)
+y_high = dnorm(x_high, mean = 3.41, sd = 0.55)
+
+polygon(x = c(3.6, x_high, 7),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+Since we extend the *pnorm()* function to all kinds of normal distributions, there is no need to do **Step 2** (convering into z-score).  
+
+**Step 3**: Compute the probability  
+Use the $1 -$ *pnorm()* approach:  
+```{r}
+1 - pnorm(3.6, mean = 3.41, sd = 0.55)
+```
+
+Use the *lower.tail = FALSE* approach:  
+```{r}
+# no need to add "1 -"
+pnorm(3.6, mean = 3.41, sd = 0.55, lower.tail = F)
+```
+
+\newpage
+
+## d
+What is the probability that a randomly selected baby boy is exactly $3$ kg?  
+
+### Answer
+The word "probability" means this is a **probability** question.  
+Notice the word "exactly", it indicates that we need to compute $P(X = 3)$.  
+Normal distribution is a **continuous** distribution. For a **continuous** distribution, the probability that a continuous value is exactly equal to a particular value is $0$ (recall that for a continuous distribution, the area under the curve is the probability).  
+Thus, $P(X = 3) = 0$.  
+
+## e
+Repeat a) but this time use pounds as unit. So if the average birth weight is $7.52$ pounds and  the standard deviation is $1.21$ pounds, what is the z-score of a baby boy that weights $3.31$ lb?  
+
+### Answer
+Recall: for an observed value $X = x$, the formula for z-score is $z = \frac{x - \mu}{\sigma}$.    
+Here, the observed value $x = 3.31$, mean $\mu = 7.52$, standard deviation $\sigma = 1.21$.  
+Plugging these numbers in, we have:  
+```{r}
+# (x - mu) / sigma
+(3.31 - 7.52) / 1.21
+```
+
+\begin{align*}
+z &= \frac{x - \mu}{\sigma} \\
+& = \frac{3.31 - 7.52}{1.21} \\
+& = -3.479339
+\end{align*}  
+
+The z-score computed with the unit *lbs* are approximately equal to the z-score computed with the unit *kg* (if we ignore the minor computation inaccuracy).  
+The reason here is that z-score is **unit-free**, and it only reflects the relative relationship between the observed value and the entire distribution.  
+
+\newpage
+
+# Problem 2
+(i) Z-score can’t be 0.  
+
+(ii) z-score measures the number of standard deviations x is away (above/below) from the mean.  
+
+(iii) z-score has the same unit as the x.  
+
+(iv) You need to use R command pnorm() to calculate z-score.   
+
+### Answer
+(i) Z-score can’t be 0. - **Incorrect**  
+$z = \frac{x - \mu}{\sigma}$, $z = 0$ means the observed value $x$ is the same as the mean.  
+  
+(ii) z-score measures the number of standard deviations x is away (above/below) from the mean. - **Correct**  
+Definition of z-score. Notice that z-score can be both positive (above the mean) and negative (below the mean).  
+  
+(iii) z-score has the same unit as the x. - **Incorrect**  
+z-score is **unit-free**.  
+  
+(iv) You need to use R command pnorm() to calculate z-score. - **Incorrect**  
+z-score is a value on the x-axis of the density curve, it can be considered a quantile.  
+*pnorm()* is used to compute the **probability** given a quantile (z-score).  
+If we know the probability of the percentile (the left side probability $p$. e.g., $90$th percentile means the left side probability is $90\% = 0.9$), we can use *qnorm(p)* to compute the corresponding z-score.  
+If we know the observed value $X = x$, we can use $z = \frac{x - \mu}{\sigma}$ to compute the z-score.  
+
+\newpage
+
+# Problem 3
+A quiz in a statistics course has four multiple-choice questions, each with five possible answers (A, B, C, D, E). A passing grade is three or more correct answers to the four questions. Abraham has not studied for the quiz. He has no idea of the correct answer to any of the questions and decides to guess at random for each.  
+
+## a
+Let X be the number of answers Abraham guesses correctly. State the distribution of X. Use statistical notation.  
+
+### Answer
+There are $4$ trials because the student guesses $4$ times (for $4$ MCQs), where $n = 4$ is fixed.  
+Note: Each trial should be a **repeatable** and **homogenous** experiment. $5$ choices are not the trials.  
+Since the student guesses **randomly**, the $4$ trails are independent.  
+Each trail has $2$ outcomes, success ("correct", $p = \frac{1}{5} = 0.2$) and failure ("incorrect", $q = \frac{4}{5} = 0.8$).  
+$2$ outcomes mean “$2$ **types** of outcomes”, success (might include multiple cases), and failure (might include multiple cases), rather than "exact $2$ possible outcomes".  
+The probability of success $p = = \frac{1}{5} = 0.2$ is the same for each trial.  
+  
+Thus, $X$ follows a binomial distribution, where the number of trials $n = 4$, probability of "success" $p = 0.2$.  
+We use the notation:  
+$$
+X \sim \text{Binom}(n = 4, p = 0.2)
+$$
+
+\newpage
+
+## *dbinom()* and *pbinom()* Functions
+### *dbinom()* Function
+Use *dbinom()* function to get the probability for a **specific** observed value $P(X = x) = \binom{n}{x} p ^ x (1 - p) ^ {n - x}$ ("point probability")  
+Format: *dbinom(x, size = n, prob = p)* $= \binom{n}{x} p ^ x (1 - p) ^ {n - x}$  
+**Arguments**:  
+*x*: the specific value $x$ for $P(X = x)$   
+*size*: number of trails ($n$)  
+*prob*: "success" probability ($p$)  
+  
+Recall: For a discrete distribution (such as binomial distribution), $P(X = x)$ is meaningful. For continuous distribution (such as normal distribtion), $P(X = x) = 0$.  
+  
+**Fun Facts**:  
+However, there exists *dnorm()* function, and it will return the **y-value** of the **density curve** rather than $P(X = x)$, but we will not use *dnorm()* in STAT 3011.   
+For "d-series" functions, they will return the **probability density** (d stands for density) of some distributions, where the probability density for discrete distributions (such as binomial distribution) is $P(X = x)$.  
+
+**Examples**:  
+$X \sim \text{Binom}(n = 4, p = 1/5)$, compute $P(X = 3)$   
+```{r}
+dbinom(3, size = 4, prob = 1/5)
+```
+  
+$X \sim \text{Binom}(n = 4, p = 1/5)$, compute $P(X = 4)$   
+```{r}
+dbinom(4, size = 4, prob = 1/5)
+```
+  
+$X \sim \text{Binom}(n = 5, p = 1/4)$, compute $P(X = 3)$  
+```{r}
+dbinom(3, size = 5, prob = 1/4)
+```
+
+$X \sim \text{Binom}(n = 5, p = 1/4)$, compute $P(X = 4)$  
+```{r}
+dbinom(4, size = 5, prob = 1/4)
+```
+
+\newpage
+
+### *pbinom()* Function
+Recall: *pnorm(z)* will return $P(Z < z) = P(Z \leq z)$ (since $P(Z = z) = 0$ for normal distribution).  
+For "p-series" functions, they will return $P(X \leq x)$ (**left** side **cumulative** probability, **include** the equal sign) of some distribution. The equal sign does not matter when computing the cumulative probability for continuous distributions because $P(X = x) = 0$ for them. However, when computing the cumulative for discrete distribution (such as binomial distribution), $P(X = x)$ might be influential because it might not be $0$.  
+  
+Use *pbinom()* function to get the **cumulative** probability $P(X \leq x) = \sum_{k = 0}^{x} \binom{n}{k} p ^ k (1 - p) ^ {n - k}$ (**include** the equal sign)    
+Format: *pbinom(x, size = n, prob = p)* $= \sum_{k = 0}^{x} \binom{n}{k} p ^ k (1 - p) ^ {n - k}$  
+**Arguments**:  
+*x*: the specific value $x$ for $P(X \leq x)$   
+*size*: number of trails ($n$)  
+*prob*: "success" probability ($p$)  
+  
+If we want to compute $P(X > x)$ (**without** equal sign, **strictly** greater than), we can use $1 -$ *pbinom(x, size = n, prob = p)*.  
+If we want to compute $P(X < x)$ (**without** equal sign, **strictly** smaller than), we can use *pbinom(x - 1, size = n, prob = p)*.    
+If we want to compute $P(X \geq x)$ (**include** equal sign), we can use $1 -$ *pbinom(x - 1, size = n, prob = p)*.   
+
+\newpage
+
+## b
+Find the probability he lucks out and answers all four questions correctly.  
+
+### Answer
+$X \sim \text{Binom}(n = 4, p = 0.2)$.
+We want to compute $P(X = 4)$.  
+Use *dbinom()* function to compute the probability when $X$ equals to a **specific** value.  
+```{r}
+# x = 4, size = n = 4, prob = p = 0.2
+dbinom(4, size = 4, prob = 0.2)
+```
+
+## c
+Find the probability that she passes the quiz.  
+
+### Answer
+A passing grade is **three or more** correct answers.  
+We want to compute $P(X \geq 3)$.  
+  
+**Approach 1** (*dbinom()*):  
+$P(X \geq 3) = P(X = 3) + P(X = 4)$  
+```{r}
+# P(X = 3)
+dbinom(3, size = 4, prob = 0.2)
+
+# P(X = 4)
+dbinom(4, size = 4, prob = 0.2)
+
+# P(X = 3) + P(X = 4)
+dbinom(3, size = 4, prob = 0.2) + dbinom(4, size = 4, prob = 0.2)
+```
+
+$P(X \geq 3) = P(X = 3) + P(X = 4) = 0.0272$  
+  
+**Approach 2** (*pbinom()*):  
+$P(X \geq 3) = 1 - P(X < 3)$  
+$P(X < 3) =$ *pbinom($\mathbf{3 - 1}$, size = 4, prob = 0.2)*  
+```{r}
+1 - pbinom(3 - 1, size = 4, prob = 0.2)
+```
+
+## d
+What is the probability that all of three friends Abraham, Benjamin, and Calvin pass the quiz if they randomly guess? What assumption(s) do you have to make if any?  
+
+### Answer
+Let $A$ be the event that Abraham passes the quiz, $B$ be the event that Benjamin passes the quiz, and $C$ be the event that Calvin passes the quiz.  
+We want to compute $P(A \cap B \cap C)$.  
+For each student, the probability of passing the quiz is the same: $P(A) = P(B) = P(C) = 0.0272$  
+Since they are three **individual** students, the easiest assumption is that their performances are **independent**.  
+$P(A \cap B \cap C) = P(A) \times P(B) \times P(C) = (0.0272) ^ 3$ (calculator ready format)  
+```{r}
+0.0272 ^ 3
+```
+
+## e
+Suppose that another quiz has $20$ multiple choice questions and students pass if they answer $75\%$ of more correctly. Dorian didn’t prepare for this quiz. What is the probability he passes? Let Y be the number of questions he guesses correctly. What are the expected value and standard deviation of Y?  
+
+### Answer
+Similarly, $Y \sim \text{Binom}(n = 20, p = 0.2)$.  
+Students will pass the quiz if they answer at least $20 \times 75 \% = 15$ questions correctly.  
+We want to compute $P(Y \geq 15)$  
+  
+**Approach 1** (*dbinom()*):  
+$P(Y \geq 15) = P(Y = 15) + P(Y = 16) + P(Y = 17) + P(Y = 18) + P(Y = 19) + P(X = 20)$  
+```{r}
+# P(Y = 15)
+dbinom(15, size = 20, prob = 0.2)
+
+# P(Y = 16)
+dbinom(16, size = 20, prob = 0.2)
+
+# P(Y = 17)
+dbinom(17, size = 20, prob = 0.2)
+
+# P(Y = 18)
+dbinom(18, size = 20, prob = 0.2)
+
+# P(Y = 19)
+dbinom(19, size = 20, prob = 0.2)
+
+# P(Y = 20)
+dbinom(20, size = 20, prob = 0.2)
+
+# P(Y = 15) + P(Y = 16) + P(Y = 17) + P(Y = 18) + P(Y = 19) + P(Y = 20)
+dbinom(15, size = 20, prob = 0.2) + dbinom(16, size = 20, prob = 0.2) + 
+  dbinom(17, size = 20, prob = 0.2) + dbinom(18, size = 20, prob = 0.2) +
+  dbinom(19, size = 20, prob = 0.2) + dbinom(20, size = 20, prob = 0.2)
+```
+
+$P(Y \geq 15) = P(Y = 15) + P(Y = 16) + P(Y = 17) + P(Y = 18) + P(Y = 19) + P(X = 20) = 1.802764e-07$  
+  
+**Approach 2** (*pbinom()*):  
+$P(Y \geq 15) = 1 - P(Y < 15)$  
+$P(Y < 15) =$ *pbinom($\mathbf{15 - 1}$, size = 20, prob = 0.2)*  
+```{r}
+1 - pbinom(15 - 1, size = 20, prob = 0.2)
+```
+
+$P(Y \geq 15) = 1.802764e-07$  
+  
+**Expected Value & Standard Deviation**  
+For **binomial distribution**, $X \sim \text{Binom}(n, p)$: the expected value $E(X) = n \times p$, the variance $Var(X) = n \times p \times (1 - p)$, the standard deviation $SD(X) = \sqrt{n \times p \times (1 - p)}$  
+  
+$Y \sim \text{Binom}(n = 20, p = 0.2)$  
+**Expect value**: 
+```{r}
+20 * 0.2
+```
+
+\begin{align*}
+E(Y) &= n \times p \\
+&= 20 \times 0.2 \\
+&= 4
+\end{align*}  
+  
+Interpretation:  
+If Dorain **repeatedly** takes the quiz consisting of $20$ MCQs with $5$ opiontions (A, B, C, D, E), **in the long run**, **on average**, the student will guesses $4$ questions correctly.  
+
+**Standard deviation**:  
+```{r}
+20 * 0.2 * (1 - 0.2)
+sqrt(20 * 0.2 * (1 - 0.2))
+```
+
+\begin{align*}
+SD(Y) &= \sqrt{n \times p \times (1 - p)} \\
+&= \sqrt{20 \times 0.2 \times (1 - 0.2)} \\
+&= \sqrt{3.2} \\
+&= 1.788854
+\end{align*}  
+  
+Interpretation:  
+Standard deviation $1.788$ states that the **typical** number of correct answers will be **within** $2$ units **from the mean** (hence the student will guess $2$ - $6$ questions correctly).  
+
+\newpage
+
+# Problem 4
+This problem, we will examine the distribution of high school GPA.  
+
+```{r, include = FALSE}
+survey = read.csv("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Survey S25.csv", header = T)
+```
+
+## Import the Dataset
+```{r eval = FALSE}
+# after setting working directory 
+survey = read.csv("survey_S25.csv") # for csv file
+survey = read.delim("survey_S25.txt") # for txt file
+
+# or without setting working directory 
+survey = read.csv(file.choose()) 
+survey = read.txt(file.choose())
+
+``` 
+
+## a
+Construct a histogram of high school GPA. Use breaks = 20 and add proper x-axis title and main title. Describe the over all shape of the distribution. 
+
+### Answer
+Use *hist()* function to draw a histogram.  
+```{r}
+# target variable: high school GPA (hs.gpa)
+hist(survey$hs.gpa, breaks = 20, xlab = "GPA", main = "High School GPA")
+```
+
+## b
+Think about why frequency table (table()) is not a good way to summarize GPA variable. You may run the command below and confirm.  
+
+### Answer
+Let's try using *table()* function first.  
+```{r}
+# target variable: hs.gpa
+table(survey$hs.gpa)
+```
+
+Frequency table will list **all possible outcomes** of a variable. Since there are **too many possible values** for GPA, the frequency table is very **cumbersome** and it is nearly impossible to list all values.  
+
+## c
+We will use logic statement to count how many students’ GPA is 0.  
+
+### Attention
+If we want to check whether two values are **equal** or not, we need to use *==* (two equal signs) in R.  
+One equal sign *=* is used to assign a value (we use *object_name = value* to create objects).  
+
+### Answer
+```{r}
+# use two equal signs (==) to check the equality
+survey$hs.gpa == 0
+```
+
+R will return many truth values.  
+  
+If we use:
+```{r, eval = FALSE}
+survey$hs.gpa = 0
+```
+
+R will set all values of the variable *hs.gpa* to $0$.  
+  
+Create a new variable *is.0* to store the truth values  
+```{r}
+# use one equal sign (=) to create objects and assign values
+is.0 = survey$hs.gpa == 0
+```
+
+## d
+We will summarize this result using table. How many student's high school GPA is 0?  
+
+### Answer
+Use *table()* function to get the frequency table of the new variable *is.0*  
+```{r}
+table(is.0)
+```
+
+This frequency table is much simpler the previous one for the variable *hs.gpa*.  
+According to the frequency table, there are $12$ students whose high school GPA is $0$. 
+
+## e
+This time, we will remove all high school GPA that is 0, then construct a normal Q-Q plot of the rest. Describe the overall shape of the distribution. 
+
+### Answer
+Use *variable[condition]* as a filter to select the observations that satisfy the condition.  
+*condition* is usually a **comparison** statement that will return *TRUE/FALSE* values.  
+Create a new variable *hs.gpa.new* that only contains non-zero high school GPAs.  
+```{r}
+# use one equal sign (=) to create objects and assign values
+# use $ to extract the variable hs.gpa from the dataset survey
+hs.gpa.new = survey$hs.gpa[survey$hs.gpa > 0]
+```
+
+**Optional Operations**:  
+Recall: two equal signs (*==*) is for checking equality.  
+*!=* ("exclamation point" "equal sign") is for checking "not equal".  
+```{r}
+hs.gpa.new = survey$hs.gpa[survey$hs.gpa != 0]
+```
+  
+Use *qqnorm()* function to draw a QQ plot; *qqline()* function to draw the QQ line (checking normality).  
+Format: *qqnorm(variable_name)*; *qqline(variable_name)*    
+Note: use *qqnorm()* function **first**, then use *qqline()* function  
+```{r}
+qqnorm(hs.gpa.new)
+qqline(hs.gpa.new)
+```
+
+Note: the **y-axis** of the QQ plot will show the **range** of the distribution; the **y-value** is the **sample quantile** (could be considered the **possible values** of the distribution)
+Students' GPA is from $2.8$ to $4$ (based on the y-axis range). Most of the dots are **below** the straight line (QQ line), so the overall distribution is **left-skewed**. We see a long horizontal line at the sample quantile $= 4.0$ (y-value $= 4.0$) because many students' GPA is 4.0.  
