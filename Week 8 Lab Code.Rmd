@@ -1,0 +1,364 @@
+---
+title: "Week 8 Lab Code"
+author: "Section 019"
+date: "2025-03-18"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Problem 1
+Match the following notations (1 - 7) to correct definitions (A - I) . Some notations may have more than one correct definition.  
+
+\begin{enumerate}
+  \item $\bar{x}$ -- B. The mean of a sample of $n$ observations.
+  \item $s$ -- F. The standard deviation of a sample of $n$ observations.
+  \item $\mu$ -- A. The mean of the population, expected value of $X$, i.e. $E(X)$.
+  \item $\sigma$
+    \begin{tabular}[t]{@{}p{\linewidth}}
+      -- H. How much individual responses vary in the entire population. \\
+      -- E. The population standard deviation, the standard deviation of the probability distribution of $X$.
+    \end{tabular}
+  \item $\mu_{\bar{X}}$
+    \begin{tabular}[t]{@{}p{\linewidth}}
+      -- C. The mean of all possible sample means from repeated drawing random samples of $n$ observations. \\
+      -- D. The mean of the sampling distribution of sample mean. \\
+      -- For any random sample with fixed sample size $n$, $\mu_{\bar{X}} = \mu$.
+    \end{tabular}
+  \item $\sigma_{\bar{X}}$
+    \begin{tabular}[t]{@{}p{\linewidth}}
+      -- G. How much sample means vary about the population mean when we repeatedly draw a random sample of $n$ observations and calculate sample mean. \\
+      -- For any random sample with fixed sample size $n$, $\sigma_{\hat{X}} = \sigma / \sqrt{n}$. \\
+      -- We often call the standard deviation of statistic “Standard Error” or SE.
+    \end{tabular}
+  \item $n$ -- I. Sample size.
+\end{enumerate}  
+
+## Recall: 
+Statistic is numeric information from a **sample**.  
+Examples: **sample** mean, **sample** proportion, **samples** standard deviation, etc.  
+
+\newpage
+
+# Problem 2
+Which of the following is not correct? The standard deviation of a statistic describes:  
+- (A) The standard deviation of the sampling distribution of that statistic.  
+- (B) The standard deviation of the observed measurements in the sample.  
+- (C) How close that statistic falls to the parameter that it estimates.  
+- (D) The variability in the values of the statistic from sample to sample of the same size.  
+
+## Answer
+(B)  
+Standard deviation of the observed measurements in the sample is sample standard deviation ($s$).  
+
+\newpage
+
+# Problem 3
+Sampling distribution of sample mean number of siblings.  
+We will use the class survey data (`survey_S25`). This time, we will analyze the **number of siblings** variable and examine how sample size affects the shape of the sampling distribution of the sample mean. **Assume that this variable represents the population distribution.**  
+
+## a
+Import data set, and use names(), and head(), and find the exact name of the variable on interest.  
+  
+### Import Dataset
+**From Working Directory**  
+If the data file is in the same folder as the working directory, we can directly use its name to import.  
+Put the file name in a pair of **quotation marks** (e.g. "file_name").
+```{r}
+getwd()
+```
+
+If the data file is in the folder "/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Week 9", we can use the following codes:  
+```{r, eval = FALSE}
+#put the file name in a pair of quotation marks
+survey = read.csv("Survey S25.csv") #for .csv file
+survey = read.delim("Survey S25.txt") #for .txt file
+```
+If we are using **R Markdown**, the working directory will automatically be the folder **containing the .Rmd file** (no need to set the working directory manually).  
+  
+**From Any Local Location**  
+Use *file.choose()* method and choose the data file in the pop-up window (highly recommended method).  
+When using *file.choose()* method, **DO NOT** put it in a pair of quotation marks, and remember the parentheses after the method name (file.choose, without parenthese, will not work).  
+```{r, eval = FALSE}
+#no quotation marks, include the parentheses
+survey = read.csv(file.choose()) #for .csv file
+survey = read.delim(file.choose()) #for .txt file
+```
+
+```{r, include = FALSE}
+survey = read.csv("/Users/william/Desktop/Course/25 Spring/STAT 3011 TA/Survey S25.csv", header = T)
+```
+
+### Examine Dataset
+Use *names()* function to get **variable names** in a dataset.  
+```{r}
+names(survey)
+```
+
+We will use the variable *num.sibling* in the following questions.  
+  
+Use *head()* function to show the first **six** lines of the dataset.  
+```{r}
+head(survey)
+```
+
+## b
+Find the mean and standard deviation of the number of siblings. Since you assume the variable is the population distribution, these mean and standard deviation are mu (population mean) and sigma (population standard deviation). Use a histogram to describe the overall shape of the population distribution. Modify the following command:  
+  
+```{r}
+mu = mean(survey$num.sibling)
+mu
+```
+
+The **population** mean $\mu = 1.941176$.  
+
+```{r}
+sigma = sd(survey$num.sibling)
+sigma
+```
+
+The **population** standard deviation $\sigma = 1.522972$.  
+
+```{r}
+hist(survey$num.sibling, main = "Population Distribution", 
+     xlab = "Number of siblings", xlim = c(0, 12))
+#xlim = c(0, 12): sets x axis with minimum 0 and maximum 12
+```
+
+Optional argument: *xlim* - set the lower and upper limit of the range of the x-axis  
+Similarly, *ylim* - set the lower and upper limit of the range of the y-axis   
+  
+The shape of the distribution is **unimodal** and **right-skewed** (right tail in the histogram). Most observations are distributed between $0$ and $2$. The range of the distribution is from $0$ to approximately $10$.  
+
+## c
+The R command *sample(x, size = n, replace = TRUE)* selects $n$ observations from a vector $x$ **with replacement**. Modify the following R command to select a sample of $5$ sibling counts. Run the command multiple times. Do you always get the same sample?  
+  
+### *sample()* Fuction
+Use *sample()* function to draw a sample from a vector.  
+Format: *sample(x, size = n, replace = ...)*  
+Arguments:  
+- x: the vector that the function draws samples from  
+- size: sample size $n$  
+- replace: *T* or *TRUE* - with replacement (each time draw from the same vector, the same item can be selected multiple times); *F* or *FALSE* - without replacement (once an item is chosen, it is not put back, so it cannot be selected again in that sample)  
+We only draw samples **with replacement** in this course. Always set *replace* to be **TRUE**.  
+  
+```{r}
+x = survey$num.sibling #create a new vector x to store the variable num.sibling
+sample(x, size = 5, replace = T)
+```
+
+We can also directly use the variable *num.sibling* as the vector.  
+```{r}
+sample(survey$num.sibling, size = 5, replace = T)
+```
+
+These two results seem to be different. Let's repeat running the command for more times.  
+```{r}
+sample(x, size = 5, replace = T)
+sample(survey$num.sibling, size = 5, replace = T)
+sample(x, size = 5, replace = T)
+sample(survey$num.sibling, size = 5, replace = T)
+sample(x, size = 5, replace = T)
+sample(survey$num.sibling, size = 5, replace = T)
+```
+
+We have run the command many times, and the results are almost all different from each other (your results on your machine might also be different from mine). In this case, we do not always get the same sample if we only use the default *sample()* function without other operations.  
+Reason: *sample()* function has random factors. Each time we run the command, the computer will generate a “random” result, which is hardly repeated when we run the command at different times (even with differences in nanoseconds) and on different machines.  
+
+## d
+R command *set.seed(seednumber)* used to set the seed (starting point) for random number generation. By specifying a seed value, you ensure that the sequence of random numbers generated is **reproducible**.  
+
+Personal suggestion: For repeatability, **ALWAYS** set seed before running codes including random factors (such as *sample()* function).  
+
+### *set.seed()* Function
+Use *set.seed()* function to set a fixed random seed for repeatability (get the same results when running codes with random factors many times).  
+Format: *set.seed($n$)*, where $n$ is the random seed that can be any number we want  
+As long as we use the **same random seed**, we will get the **same result** when we run codes with random factors.  
+
+```{r}
+set.seed(1) #you can change "1" to any seed number you want, such as 42, 3011, etc.
+
+x = survey$num.sibling
+sample(x, size = 5, replace = T)
+```
+
+If we run the code **multiple times**, the results are still not the same because they are **different samples**, but on each machine, the **order** of the multiple samples should still be the same.  
+  
+If we change the random seed, the result will also change.  
+```{r}
+set.seed(3011) #change the random seed to 3011
+
+x = survey$num.sibling
+sample(x, size = 5, replace = T)
+```
+  
+If we change the random seed back to $1$, the result will also be $5 \, 3 \, 2 \, 2 \, 6$.  
+```{r}
+set.seed(1) #change the random seed back to 1
+
+x = survey$num.sibling
+sample(x, size = 5, replace = T)
+```
+
+## e
+What are the sample mean ($\bar{x}$) and sample standard deviation ($s$) from this particular sample of $5$ (typo in the lab handout, sample size should be $5$) observations?  
+  
+```{r}
+set.seed(1)
+
+x = survey$num.sibling
+mysample = sample(x, size = 5, replace = T)
+
+mean(mysample)
+sd(mysample)
+```
+
+The **sample** mean $\bar{x} = 3.6$.  
+The **sample** standard deviation $s = 1.81659$.  
+
+## f
+You can repeat this process $1000$ times or use the R command *replicate()*. Try the following R commands and examine the results. How many samples do you have? What is the sample size?  
+  
+### *replicate()* Function
+Use *replicate()* function to **repeat running** some commands for a **fixed number of times**.  
+Format: *replicate(repeat_times, command)*  
+
+```{r}
+set.seed(1)
+
+x = survey$num.sibling
+replicate(2, sample(x, size = 5, replace = T))
+```
+
+We automatically run the command *sample(x, size = 5, replace = T)* for $2$ times, and then draw $2$ samples ($[5, 3, 2, 2, 6]$ and $[1, 2, 0, 1, 2]$).  
+For each sample, the sample size is still $5$.  
+
+## g
+Observe the following R command. This time, what outcome(s) do you expect to see? Run and check.  
+
+```{r}
+set.seed(1)
+
+x = survey$num.sibling
+replicate(2, mean(sample(x, size = 5, replace = T)))
+```
+
+We automatically run the command *mean(sample(x, size = 5, replace = T))* for $2$ times, drawing $2$ samples, and then compute the samples means respectively for the two samples. Thus, we have $2$ outcomes because we compute $2$ sample means for $2$ samples.  
+
+## h
+Modify the R command from (g) and generate $1000$ sample means from random samples of size $n = 5$. Save the outcome as `xbar.n5`.  
+
+```{r}
+set.seed(1)
+
+x = survey$num.sibling
+xbar.n5 = replicate(1000, mean(sample(x, size = 5, replace = T))) #repeat 1000 times
+xbar.n5
+```
+
+We have $1000$ sample means for $1000$ samples that we have drawn, and each sample has a sample size $n = 5$.  
+
+## i
+Construct sampling distribution of sample mean number of siblings from samples of size $n = 5, 50, 100, 200$. How does the shape of the sampling distribution change as n increases?  
+  
+```{r}
+par(mfrow = c(2, 2)) #display 4 graphs in a 2 by 2 grid simultaneously 
+
+set.seed(1)
+x = survey$num.sibling
+
+#n = 5
+xbar.n5 = replicate(1000, mean(sample(x, size = 5, replace = T)))
+hist(xbar.n5, xlim = c(0, 12), main = "n = 5")
+
+#n = 50
+xbar.n50 = replicate(1000, mean(sample(x, size = 50, replace = T)))
+hist(xbar.n50, xlim = c(0, 12), main = "n = 50")
+
+#n = 100
+xbar.n100 = replicate(1000, mean(sample(x, size = 100, replace = T)))
+hist(xbar.n100, xlim = c(0, 12), main = "n = 100")
+
+#n = 200
+xbar.n200 = replicate(1000, mean(sample(x, size = 200, replace = T)))
+hist(xbar.n200, xlim = c(0, 12), main = "n = 200")
+
+
+par(mfrow = c(1, 1)) #change back to the default display setting (1 graph)
+```
+
+When the sample size $n$ increases, the shape of the sampling distribution of the sample mean is more and more like a normal distribution (symmetric and bell-shaped), and the distribution will be less spread out (more centered around the mean) when $n$ increases.  
+
+**Compare Mean of Sample Means**  
+```{r}
+#mean of 1000 samples
+mean(xbar.n5) #sample size n = 5
+mean(xbar.n50) #sample size n = 50
+mean(xbar.n100) #sample size n = 100
+mean(xbar.n200) #sample size n = 200
+```
+The means of sample mean are approximately the same as the population mean ($\mu = 1.941176$).  
+Increasing the number of samples (such as using $20000$ samples) will give better results.  
+  
+**Standard Deviation of Sample Mean**  
+```{r}
+#standard deviation of 1000 samples
+sd(xbar.n5) #sample size n = 5
+sd(xbar.n50) #sample size n = 50
+sd(xbar.n100) #sample size n = 100
+sd(xbar.n200) #sample size n = 200
+```
+
+As the sample size $n$ increases, the standard deviation of the distribution of the sample mean decreases, as expected.  
+
+**Compare the Standard Deviation of Sample Mean with $\frac{\sigma}{\sqrt{n}}$**  
+```{r}
+sigma = sd(survey$num.sibling)
+sigma / sqrt(5) #sample size n = 5
+sigma / sqrt(50) #sample size n = 50
+sigma / sqrt(100) #sample size n = 100
+sigma / sqrt(200) #sample size n = 200
+```
+
+The standard deviations of the sample mean we computed from the experiment are approximately equal to the theoretical standard deviations of sample means computed by the formula $\ \frac {\sigma}{\sqrt{n}}$.  
+
+## j
+For each of the following, select True/False.  
+  
+1) $X$: the number of siblings is continuous : T/F  
+- False
+- The number of sibilings can only be integers.  
+  
+2) $\bar{X}$: the mean number of siblings from a fixed sample size $n = 15$ is continuous.  
+- False  
+- For a fixed sample size $n$, the possible values of the sample mean number of siblings is always $\frac{0}{15}, \frac{1}{15}, \frac{2}{15}, \cdots, \frac{\text{some integer}}{15}$. As these values don’t form intervals, $\bar{X}$ is discrete.  
+  
+3) As $n$ increases, the mean of sample means ($\mu_{\bar{X}}$) increases.  
+- False  
+- Mean of sample mean $\mu_{\bar{X}} = \mu$, regardless of sample size $n$ for random samples.  
+  
+4) As $n$ increases, the standard deviation of sample means ($\sigma_{\bar{X}}$) decreases.  
+- True  
+- Standard deviation of sample mean $\sigma_{\bar{X}} = \frac{\sigma}{\sqrt{n}}$ decreases as $n$ increases. As sample size increases, sample mean from each sample of size $n$ varies less (by the Law of Large Numbers).   
+  
+5) As $n$ increases, the population standard deviation ($\sigma$) decreases.  
+- False  
+- Population standard deviation $\sigma$ does not change (parameters are fixed).  
+  
+6) As $n$ increases, the population distribution becomes normal. (We observed the population distribution from part (b))  
+- False  
+- The shape of the population distribution is fixed (the shape of the sampling distribution of sample means, which is the distribution from part (i), will change).  
+
+7) As $n$ increases, sampling distribution of sample mean becomes approximately normal.  
+- True  
+- When population is unknown or not normal, sampling distribution of sample mean is approximately normal as $n$ increases (by Central Limit theorem).  
+- When population is normal, the sampling distribution of the sample mean is normal for any sample size $n$ (property of normal distribution).  
+  
+8) To find z-score of sample mean $\bar{x}$, we use $z = \frac{\bar{x} - \mu}{\sigma}$.  
+- False  
+- Recall: for $X \sim N(\mu, \sigma)$, z-score of $x$ is $\frac{x - \mu}{\sigma}$.  
+- Similarly, $\bar{X} \sim N(\mu, \frac{\sigma}{\sqrt{n}})$, z-score of $\bar{x}$ is $\frac{x - \mu}{\sigma /\ \sqrt{n}}$.    
