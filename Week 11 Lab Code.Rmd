@@ -1,0 +1,339 @@
+---
+title: "Week 11 Lab Code"
+author: "Section 019"
+date: "2025-04-07"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Problem 1
+For each scenario, determine whether the samples are independent or matched pairs.  
+
+## a
+A researcher randomly samples four patients with high blood pressure and measures their systolic blood pressure initially. The researcher then assigned the patients to walk briskly for half an hour a day. A month later, those patients' blood pressure was measured again.  
+
+### Answer
+**Matched pairs**   
+Reason: **different treatment for the same individual**  
+Since we have multiple individuals, and the blood pressure for **the same individual** were measured **before** and **after** the treatment (walking briskly for half an hour daily), it is matched pairs.  
+
+## b
+A student in STAT 3011 wants to compare the selling prices of textbooks at two internet bookstores (say amazon.com v.s. barnesandnoble.com). She first took a random sample of 10 textbooks used that term in courses at the U based on the list of texts compiled by the college bookstore. Then collected the prices of those 10 textbooks at the two internet sites.  
+
+### Answer
+**Matched pairs**   
+Reason: **meaningful pairs**  
+For **the same textbook**, its price from Amazon can be **matched** with another price from Barns and noble (price of the same textbook).  
+If the student randomly selected 10 books from Amazon and randomly selected another 10 books from Barns and noble, it would be independent two sample study because we are comparing the samples from different population (different textbooks).  
+
+## c
+A researcher is studying the effect of smoking on lung capacity. They recruited individuals, matched one smoker and one non-smoker based on age, gender, and BMI then measured each person's lung capacity.  
+
+### Answer
+**Matched pairs**  
+Reason: **meaningful pairs**  
+Notice the word "**matched** by age, gender, and BMI", the expression is saying that the researcher is setting up some pairs for the research.  
+
+## d
+*(Utts \& Heckard)*  In a randomized experiment, researchers either stared or did not stare at the drivers of automobiles stopped at a campus stop sign. The researchers timed how long it took each driver to proceed from the stop sign to a mark on the other side of the intersection. The researchers wish to test the stare would speed up the crossing times, so the mean crossing time for those who did not experience the stare would be longer (slower) than it would be for those who did.  
+Suppose that the crossing times, in seconds, are as follows :   
+
+* No-stare group: 8.3, 5.5, 6.0, 8.1, 8.8, 7.5, 7.8, 7.1, 5.7, 6.5, 4.7, 6.9, 5.2, 4.7  
+* Stare group: 5.6, 5.0, 5.7, 6.3, 6.5, 5.8, 4.5, 6.1, 4.8, 4.9, 4.5, 7.2, 5.8  
+
+### Answer
+**Independent samples**  
+Reason: **each individual is only measured once**, **possibly different sample size**  
+There seems to be no meaningful way to match one observation from the "non-stare group" to another observation from the "stare group" because a driver is only measured once, and we cannot compare the same driver's behavior with different treatment (stare vs. non-stare) and the treatment of staring might not be the only factor that will influence the waiting time for different drivers (e.g., driver's habit might be another factor). Also, the sample sizes for the non-stare and stare groups are not guaranteed to be the same (in the example, we have $14$ observations for the non-stare group, while $13$ observations for the stare group).  
+
+\newpage
+
+# Notations
+## Matched Pairs
+$D$: **difference** between **pairs** (pairwise differences, $D = X_1 - X_2$, $d_i = x_{1i} - x_{2i}$)  
+$\mu_D$: **population** mean **difference** within **pairs**  
+$\bar{x}_D$: **sample** mean of difference between pairs  
+$s_D$: sample standard deviation of difference within pairs ($D$ is a random variable)  
+$SE_D$: standard error of differences, $se = \frac{s_D}{\sqrt{n}}$, where $n = n_1 = n_2$  
+
+## Independent Samples
+$\mu$: **population** mean (of the population group 1, 2)  
+$\mu_1 - \mu_2$: difference between two **population** means  
+$\bar{x}$: **sample** mean (of the population group)  
+$\bar{x}_1 - \bar{x}_2$: difference between two **sample** means
+SE (standard error) in two independent sample analysis: $se = \sqrt{\frac{s_1 ^ 2}{n_1} + \frac{s_2 ^ 2}{n_2}}$ - how much difference between samples vary (SE is the standard deviation for a statistic)  
+
+\newpage
+
+# Problem 2
+Estimate average difference between weekday and weekend sleep hours for all college students.  
+Use the class survey data (`survey_S25.csv`). Assume that this data set represents a random sample of college students.  
+
+## Explore the Dataset
+```{r}
+survey = read.csv("http://users.stat.umn.edu/~parky/survey_S25.csv")
+
+names(survey) #check the exact names of variables
+```
+
+We will focus on the variable *time.sleep.weekday* and *time.sleep.weekend*.  
+
+## a
+Make (i) a side-by-side boxplot of weekday and weekend (ii) boxplot of difference of sleep hours for each students where D = weekend - weekday sleep hours. Do you think there is any difference between students weekday and weekend average sleep hours?  
+
+### (i) Side-by-Side Boxplot
+Recall: use command *boxplot(var1, var2)* to draw a side-by-side boxplot, where *var1* is shown in the left sub-boxplot, *var2* is shown in the right sub-boxplot.   
+
+```{r}
+boxplot(survey$time.sleep.weekend, survey$time.sleep.weekday, 
+        names = c("Weekend", "Weekday"), main = "Sleep Hours")
+```
+
+Note: if we want to set the name for a graph, we need to put the name in a pair of **quotation marks**.  
+
+### (ii) Boxplot of Difference
+```{r}
+d = survey$time.sleep.weekend - survey$time.sleep.weekday
+boxplot(d, main = " D = Weekend - Weekday Sleep Hours")
+```
+
+Since there are some outliers, we can change the *ylim* (y-axis range) to see the central part better.  
+
+```{r}
+boxplot(d, main = "Difference in Sleep Hours, with ylim", ylim = c(-1, 4))
+```
+
+We change the range of the y-axis to $[-1, 4]$ by adding the argument *ylim = c(-1, 4)*.  
+
+From the boxplot of difference, most of difference is positive, $D = \text{weekend} - \text{weekday} > 0$, meaning that students tend to sleep more on weekends than weekdays.  
+
+## b
+Construct a 99% confidence interval for mean of difference between students weekday and weekend sleep hours. Interpret it in the context of the problem. Since students weekday and weekend sleep hours match, it is paired data.  
+
+### Recall: *t.test()* Function for Confidence Interval and Hypothesis Tests
+**Confidence Interval**:   
+Format: *t.test(x, alternative = "two.sided", conf.level = 1 - alpha)*  
+where:  
+*x*: the variable that we want to construct the CI for the mean (use the sample mean of $x$ to construct CI)  
+*alternative*: since CIs are two-sided, we always set *alternative = "two.sided* when using *t.test()* to construct CI  
+*conf.level*: confidence level $1 - \alpha$  
+  
+**Hypothesis Test**:  
+Format: *t.test(x, mu = mu0, alternative = ..., conf.level = 1 - alpha)*  
+where:  
+*x*: the variable that we want to perform the hypothesis test for the mean (use the sample mean of $x$ to estimate $\mu$, the sample mean $\bar{x}$ is used when computing the test statistic)  
+*mu*: the hypothesized value that appears in both null and alternative hypotheses  
+*alternative*: the inequality sign in the alternative hypothesis ($<$: "less"; $>$: "greater"; $\neq$: "two.sided")  
+*conf.level*: confidence level $1 - \alpha$  
+
+\newpage
+
+### t.test() Function Con'd. Con'd.
+For two samples, we need to specify two new arguments: *y* and *paired*.  
+*y*: the second variable (beside *x*, we only use the argument *x* for one sample CI and hypothesis test)   
+R will automatically construct the CI / perform the hypothesis test on the difference $x - y$  
+*paired*:  
+
+- *TRUE* - matched pair  
+- *FALSE* (default, or ignore the argument): independent two sample  
+
+**Clarification of the Question Type**  
+Treatment: **weekday** vs. **weekend** (two treatments)  
+Population: **all college students** (one population)  
+Since **weekday** and **weekend** are the **different treatment levels** for the same sample (25Spring STAT 3011 students), we could consider the two samples **matched pairs**.  
+
+```{r}
+#CI for weekday - weekend
+
+#To construct CI, we need to:
+#set conf.level = 1 - alpha (confidence level)
+#set alternative = "two.sided" (CI is two sided)
+
+t.test(x = survey$time.sleep.weekday, y = survey$time.sleep.weekend,
+       conf.level = 0.99,
+       alternative = "two.sided",
+       paired = T)
+```
+
+**Interpretation**:  
+If we repeatedly select a random sample and construct a $99\%$ confidence interval, then in the long run, $99\%$ of the confidence interval $[-1.567183, -1.152540]$ will contain the **true** mean of difference in sleep hours ($D = \text{weekday} - \text{weekend}$).  
+We are $99\%$ confident that mean of difference in sleep hours$D = \text{weekday} - \text{weekend}$ is between $-1.567183$ and $-1.152540$. In other word, we are $99\%$ confident that students sleep hours $1.152540$ to $1.567183$ hours **longer** on weekend than weekday on average.  
+
+\newpage
+
+# Problem 3
+Test $H_a$: $\mu_D < 0$ where $D = \text{weekday} - \text{weekend}$  
+Use the same data test whether on average students sleep more on weekend. Report the test statistic and p-value. Use $\alpha = 0.05$.  
+
+```{r}
+#Hypothesis for Weekday - Weekend
+#x = Weekday, y = Weekend, D = x - y
+
+#To perform hypothesis test, we need to:
+#set mu = 0 (hypothesized value)
+#set conf.level = 1 - alpha (confidence level)
+#set alternative = "less" (the same inequality sign in the alternative hypothesis)
+
+t.test(x = survey$time.sleep.weekday, y = survey$time.sleep.weekend,
+       mu = 0,
+       conf.level = 1 - 0.05,
+       alternative = "less",
+       paired = T)
+```
+
+The p-value is smaller than $2.2e-16 < 0.05$, so we will reject the null hypothesis at the significance level $\alpha = 0.05$, meaning that the average sleep time for weekdays is less than the sleep time for weekends.  
+
+\newpage
+
+## Follow-up Question
+Is the result statistically significant? It is practically significant?  
+  
+The p-value is small ($< 2e-16$), which is smaller than $\alpha = 0.05$, hence it is statistically significant.  
+
+```{r}
+d = survey$time.sleep.weekday - survey$time.sleep.weekend
+mean(d)
+```
+
+The difference of sleep hours between weekday and weekend is $-1.359$ ($1$ hour $24$ minutes) per night. This number is practically meaningful in the context (hours of sleep per night), hence is practically significant.  
+
+\newpage
+
+# Problem 4
+Compare weekday sleep hours of senior and Freshman.  
+Construct a $95\%$ confidence interval for difference between two population means. Interpret the result. Based on the confidence interval, can we conclude that Freshman students sleep more on average than senior students?  
+
+Recall: we usually consider the *vector[condition]* structure as a **"filter"**, which returns the elements in the vector that satisfy the *condition*, where *condition* is usually a judgement statement.    
+R will list the exercise time for freshman only (print the time.exercise if the condition in the *[]* is met).  
+
+```{r}
+#time.sleep.weekday of seniors
+zzz.sr = survey$time.sleep.weekday[survey$year == "Senior"]
+mean(zzz.sr)
+
+#time.sleep.weekday of freshmen
+zzz.fr = survey$time.sleep.weekday[survey$year == "Freshman"]
+mean(zzz.fr)
+```
+
+**Clarification of the Question Type**  
+Treatment: **weekday** (one treatment)  
+Population: **freshmen** and **senior** (two different populations)  
+Since we have **two populations** (freshmen and seniors) and they are independent, we could consider the two samples **independent two samples**.  
+
+```{r}
+#CI for freshmen - seniors
+
+#To construct CI, we need to:
+#set conf.level = 1 - alpha (confidence level)
+#set alternative = "two.sided" (CI is two sided)
+
+t.test(x = zzz.fr, y = zzz.sr,
+       conf.level = 0.95,
+       alternative = "two.sided",
+       paired = F) 
+
+#We can also just ignore the argument: paired (FALSE by default)
+t.test(x = zzz.fr, y = zzz.sr,
+       conf.level = 0.95,
+       alternative = "two.sided")
+```
+
+**Interpretation**:  
+If we repeatedly select a random sample and construct a $95\%$ confidence interval, then in the long run, $95\%$ of the confidence interval $[-0.2340624, 0.6604361]$ will contain the **true** difference between mean sleep hours for freshman and senior.  
+We are $95\%$ confident that two difference between mean sleep hours for freshman and senior is between $-0.2340624$ hours and $0.6604361$ hours.  
+
+## Optional: \textit{tapply()} Function
+Use \textit{tapply()} function to apply a R function on a \textbf{subset} of \textbf{vector}.  
+\textit{tapply()} function is another instance of \textbf{vecorized computation} in R, and it has the same vecorized computation rules:  
+If we apply an operation (a R function here) on a \textbf{vector} (a subset of a vector here), R will apply the function on \textbf{each item} simultaneously and \textbf{individually}.  
+Format: \textit{tapply(target\_vector, group\_vector, function\_name, optional arguments, $\cdots$)}  
+\textbf{Attention:}  
+\textit{target\_vector} is usually a \textbf{quantitative variable}  
+\textit{group\_vector} is usually a \textbf{categorical variable}  
+Use \textit{function\_name} \textbf{only without parentheses} (this only applies for using a R function as an \textbf{argument} in \textit{apply()} family functions, such as \textit{tapply()} here)    
+
+```{r}
+#use of tapply : ("tag" apply)
+#tapply(quantitative, group variable, function)
+#to find group mean sleep hours of each year
+tapply(survey$time.sleep.weekday, survey$year, mean)  #group mean
+tapply(survey$time.sleep.weekday, survey$year, sd) #group standard deviation
+tapply(survey$time.sleep.weekday, survey$year, length) #group sample size
+```
+
+\newpage
+
+# Problem 5
+Modify the t.test command from the previous problem and test whether Freshmen students sleep more than average. Use $\alpha = 0.01$. State the null and alternative hypothesis. Report test statistic and p-value, draw conclusion.  
+
+$H_a$: $\mu_{\text{fr}} > \mu_{\text{sr}}$ i.e., $\mu_{\text{fr}} - \mu_{\text{sr}} > 0$  
+*x*: *zzz.fr*, *y*: *zzz.sr*  
+```{r}
+#Hypothesis for freshmen - seniors
+#x = zzz.fr, y = zzz.sr
+
+#Test mu_fr > mu_sr
+#no need to include the argument mu (because we are comparing two means)
+t.test(x = zzz.fr, y = zzz.sr, 
+       conf.level = 1 - 0.01,
+       alternative = "greater")
+
+#Test mu_fr - mu_sr > 0
+#include the argutment: mu (hypothesize value: mu = 0)
+t.test(x = zzz.fr, y = zzz.sr, mu = 0,
+       conf.level = 1 - 0.01,
+       alternative = "greater")
+
+#the solution said we should use "less"?
+```
+
+\newpage
+
+$H_a$: $\mu_{\text{sr}} < \mu_{\text{fr}}$ i.e., $\mu_{\text{fr}} - \mu_{\text{sr}} < 0$  
+*x*: *zzz.sr*, *y*: *zzz.fr*  
+```{r}
+#Hypothesis for senoirs - freshmen
+#x = zzz.sr, y = zzz.fr
+
+#Test mu_fr > mu_sr
+#no need to include the argument mu (because we are comparing two means)
+t.test(x = zzz.sr, y = zzz.fr, 
+       conf.level = 1 - 0.01,
+       alternative = "less")
+
+#Test mu_fr - mu_sr > 0
+#include the argutment: mu (hypothesize value: mu = 0)
+t.test(x = zzz.sr, y = zzz.fr, mu = 0,
+       conf.level = 1 - 0.01,
+       alternative = "less")
+
+#the solution said we should use "greater"?
+```
+
+**Hypothesis**:  
+$H_0$: $\mu_{fr} = \mu_{sr}$ (i.e., $\mu_{fr} - \mu_{sr} = 0$) vs. $H_a$: $\mu_{fr} > \mu_{sr}$  (i.e. $\mu_{fr} - \mu_{sr} > 0$)  
+**Test Statistic**:  
+```{r}
+(xbar_fr = mean(zzz.fr))
+(xbar_sr = mean(zzz.sr))
+
+s2_fr = var(zzz.fr)
+s2_sr = var(zzz.sr)
+n_fr = length(zzz.fr)
+n_sr = length(zzz.sr)
+
+(t = (xbar_fr - xbar_sr) / (sqrt((s2_fr / n_fr) + (s2_sr / n_sr))))
+```
+
+$t = \frac{\bar{x}_{fr} - \bar{x}_{sr}}{\sqrt{\frac{s_{fr} ^ 2}{n_{fr}} + \frac{s_{sr} ^ 2}{n_{sr}}}} > 0$ (since $)
+$t = 0.9677767$  
+
+**p-value**:  
+$p$-value $= 0.1699$  
+The $p$-value is (*Select one*: **greater**, smaller)  than $\alpha = 0.01$, hence we (*select one*: reject, **fail to reject**) the null hypothesis. We (*select one*: do, **don't**) have enough evidence to conclude that the population mean sleep hours for freshman is greater than the mean sleep hours of seniors.  

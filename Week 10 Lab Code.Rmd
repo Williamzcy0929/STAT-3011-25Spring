@@ -1,0 +1,344 @@
+---
+title: "Week 10 Lab Code"
+author: "Section 019"
+date: "2025-04-01"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Problem 1
+For each of the following, state the parameter of interest, and null and alternative hypothesis using statistical notations.  
+
+## a
+The Ford Motor Company claims that its 2017 model of the Ford Escape averages $30$ miles per gallon for highway driving. A group of owners of the 2017 Ford Escape model suspects that the company is exaggerating the highway mile per gallon (mpg) and decides to conduct a test. After $50$ test drives, they found a sample mean of $27$ mpg.  
+
+### Answer
+Notice the word **"average"**, in statistics, we usually call the "average" **"mean"**. Parameter is from the population, we usually use **Greek letters** for **parameters**.   
+The parameter: $\mu$, the **true population mean** miles per gallon for highway driving of Ford escape 2017 model.  
+  
+In STAT 3011, we ONLY consider the **equal case** for $H_0$ (always and only use the equal sign).  
+$H_0$: $\mu = 30$  
+  
+We **suspect** the company is **exaggerating**, which means we want to prove that the **actual** population mean is **smaller** than what the company advertises (we want to find evidences to support that the real mpg is **less than** what the company advertises).  
+$H_a$: $\mu < 30$ (what we want to prove)  
+
+## b
+One study has suggested that students in college study an average of $11$ hours per week. Suppose you want to test whether college students who plan to go to graduate school study more than 11 hours per week on average. So you randomly selected $20$ students who planned to go to graduate schools and asked about their average study hours.  
+
+### Answer
+Notice the word **average**, in statistics, we usually call the "average" **"mean"**. Parameter is from the population, we usually use **Greek letters** for **parameters**.   
+The parameter: $\mu$, the **true population mean** of study hours per week for those who plan to go to graduate school.  
+  
+Still, we only consider the **equal case** for $H_0$.  
+$H_0$: $\mu = 11$  
+  
+We **want to test** whether college students who plan to go to graduate school study **more than** 11 hours per week on average.  
+$H_a$: $\mu > 11$  
+
+\newpage
+
+# Problem 2
+Finding p-value.  
+
+## *pt()* Function
+Since p-value (p can be stand for "probability") is a **probability**, we will use *pt()* to compute the probability for t-distribution given a x-value (the test statistic).  
+Use *pt()* to obtain the cumulative probability $P(T < t)$ for a given $t$-value in a **t distribution** with the specified degrees of freedom ($df$).  
+Similar to *pnorm()* for the **normal distribution**, *pt()* gives you the **left-side probability** under the **t distribution**.  
+Format: *pt(q, df = df)* (returns $P(T < q)$ for a t-distribution with degree of freedom $= df$)  
+**Arguments**:  
+*df*: degree of freedom, need to be explicitly specified in the command (because *df* is a compulsory parameter for t-distribution, and there is no default value of *df* in R). We usually use $df = n - 1$ when constructing confidence interval for $\mu$.  
+*lower.tail*: extend *pt()* function for right side ($>$ or $\geq$) probability if we set *lower.tail = FALSE*.    
+
+The inequality sign we used when computing the p-value is the same inequality sign in the **alternative** hypothesis.  
+$t$ is the value of the test statistic, $t_n = \frac{\bar{x} - \mu_0}{s / \sqrt{n}} \sim t_{n - 1}$  
+
+### $H_a$: $\mu > \mu_0$
+```{r, echo = FALSE}
+curve(dt(x, df = 1981),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      main = "",
+      lwd = 2)
+
+x_high = seq(2, 3, length.out = 200)
+y_high = dt(x_high, df = 1981)
+polygon(x = c(2, x_high, 3),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+The **"more extreme"** case is the **"too large"** case.  
+p-value: $P(t_n > t)$, we should use *pt(t, df = n - 1, lower.tail = F)* (upper tail probability)  
+
+### $H_a$: $\mu < \mu_0$
+```{r, echo = FALSE}
+curve(dt(x, df = 1981),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      main = "",
+      lwd = 2)
+
+x_high = seq(-3, -2, length.out = 200)
+y_high = dt(x_high, df = 1981)
+polygon(x = c(-3, x_high, -2),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+The **"more extreme"** case is the **"too small"** case.  
+p-value: $P(t_n < t)$, we should use *pt(t, df = n - 1, lower.tail = T)* (lower tail probability)  
+
+### $H_a$: $\mu \neq \mu_0$
+```{r, echo = FALSE}
+curve(dt(x, df = 1981),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      main = "",
+      lwd = 2)
+
+x_high = seq(-3, -2, length.out = 200)
+y_high = dt(x_high, df = 1981)
+polygon(x = c(-3, x_high, -2),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+
+x_high = seq(2, 3, length.out = 200)
+y_high = dt(x_high, df = 1981)
+polygon(x = c(2, x_high, 3),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+The **"more extreme"** cases are the **"too small"** case and **"too large"** case.  
+p-value: $P(t_n < -\lvert t \rvert) + P(t_n > \lvert t \rvert)$, we should use \textit{2 * pt(|t|, df = n - 1, lower.tail = F)} ($2 \times$ upper tail probability) or \textit{2 * pt(-|t|, df = n - 1, lower.tail = T)} (use the negative value, $2 \times$ lower tail probability)  
+
+## a
+$H_a: \mu > 10$, test statistic is $t ^ {*} = 3$. If the sample size is $10$, find the p-value.  
+
+### Answer
+The inequality sign in the alternative hypothesis $H_a$ is $>$, then we will use $>$ when computing the p-value.  
+If the null hypothesis is true, the distribution of the test statsitic is a **t-distribution** with degree of freedom $n - 1 = 10 - 1 = 9$.  
+p-value is the probability of obtaining a test stat $3$ or greater (because only sample estimates that are "large" can  alternative hypothesis $H_a$:$\mu > 10$).  
+
+```{r}
+curve(dt(x, df = 9),
+      from = -4, to = 4,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      main = "",
+      lwd = 2)
+
+x_high = seq(3, 4, length.out = 200)
+y_high = dt(x_high, df = 9)
+polygon(x = c(3, x_high, 4),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+p-value $= P(T_9 > 3)$  
+We can use *pt(test_stat, df = n - 1, lower.tail = F)* or *1 - pt(test_stat, df = n - 1)* to compute the p-value.  
+```{r}
+pt(3, df = 10 - 1, lower.tail = F)
+1 - pt(3, df = 10 - 1)
+```
+
+The p-value is $0.007478182$.  
+
+## b
+$H_a$: $\mu \neq 10$, test statistic is $t^ {*} = 3$. If the sample size is $10$, find the p-value.  
+The inequality sign in the alternative hypothesis $H_a$ is $\neq$, then we will use both $<$ and $>$ when computing the p-value.  
+With a **two-sided** alternative hypothesis ($\neq$), the p-value should be a **two-tailed area**.  
+
+```{r}
+curve(dt(x, df = 9),
+      from = -4, to = 4,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      main = "",
+      lwd = 2)
+
+x_high = seq(3, 4, length.out = 200)
+y_high = dt(x_high, df = 9)
+polygon(x = c(3, x_high, 4),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+
+x_high = seq(-4, -3, length.out = 200)
+y_high = dt(x_high, df = 9)
+polygon(x = c(-4, x_high, -3),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+p-value $= P(T_9 < -3) + P(T_9 > 3) = 2 \times P(T_9 > 3) \text{ or } 2 \times P(T_9 < -3)$ (since t distribution is symmetric)  
+```{r}
+#use the upper tail probability
+2 * pt(3, df = 10 - 1, lower.tail = F)
+2 * (1 - pt(3, df = 10 - 1))
+
+#use the lower tail probability
+2 * pt(-3, df = 10 - 1)
+```
+
+The p-value is $0.01495636$.  
+
+\newpage
+
+# Problem 3
+In this lab handout, we will analyze exercise hours among college freshmen and conduct a hypothesis test to determine if the average exercise time per day differs from $1$ hour. Import the class survey data, then look for the **exact** column names we will be using in this problem.  (We need to know exercise hours of college freshmen)  
+
+**Import the Dataset**  
+```{r}
+survey = read.csv("http://users.stat.umn.edu/~parky/survey_S25.csv")
+```
+
+## a
+Use the following command and explain what the outcomes mean.  
+```{r}
+table(survey$year)
+```
+
+R will generate the **frequency table** of the variable *year* of the dataset *survey*, which contains the **number** of freshmen, sophomores, juniors, seniors, etc.  
+
+## b
+Use the following command and explain what the outcomes mean.  
+```{r}
+survey$year == "Freshman"
+```
+
+Recall: we use *==* (two equal signs) in R to check whether two values are the same; we use *=* (one single equal sign) in R to assign a value to an object.  
+Here, the command *survey$year == "Freshman"* checks whether each student is a freshman or not (vectorized computation in R, check each individual element in a vector). Only returns *TRUE* if a student is a freshman.  
+Attention: if a value or an argument is a piece of text data (such as "Freshman" here), we need to put the text data in a pair of **quotation marks** (the same operation when we specify the **titles** of a *plot()* or *hist()* function).  
+  
+```{r}
+head(survey$year == "Freshman")
+```
+
+*head()* function will list the first $6$ elements of the vector *survey$year == "Freshman"* by default.  
+
+## c
+Use the following command and explain what the outcomes mean.  
+```{r}
+(survey$time.exercise[survey$year == "Freshman"])
+```
+
+Recall: we usually consider the *vector[condition]* structure as a **"filter"**, which returns the elements in the vector that satisfy the *condition*, where *condition* is usually a judgement statement.    
+R will list the exercise time for freshman only (print the time.exercise if the condition in the *[]* is met).  
+
+## d
+Save Freshman students’ exercise hours as *x*, construct a histogram of *x*, and find the mean and standard deviation of *x*.  
+```{r}
+#create a new variable x to save the freshman students’ exercise hours
+x = survey$time.exercise[survey$year =="Freshman"]
+
+#draw the histogram
+hist(x, main="College Freshman exercise time", xlab= "Hours per day")
+
+#compute the mean and sd
+(xbar = mean(x)) #sample mean xbar
+(s = sd(x)) #sample standard deviation s
+```
+The sample mean $\bar{x}$ is $1.337912$.  
+The sample standard deviation $s$ is $0.9430842$.  
+
+Recall: use the *length()* function to get the length of a vector (the sample size).  
+```{r}
+(n = length(x)) #sample size n
+```
+
+## e
+Use `t.test()` to test whether the mean exercise hours for college freshman students is greater than $1$ hour per day. Use $\alpha = 0.01$.  
+
+### *t.test()* Function for Hypothesis Tests
+Recall: use `t.test()` to construct the confidence interval  
+Format: *t.test(x, alternative = "two.sided", conf.level = 1 - alpha)*  
+where:  
+*x*: the variable that we want to construct the CI for the mean (use the sample mean of $x$ to construct CI)  
+*alternative*: since CIs are two-sided, we always set *alternative = "two.sided* when using *t.test()* to construct CI  
+*conf.level*: confidence level $1 - \alpha$  
+  
+When we want to construct the CI, we need one more argument representing the **hypothesized value** (i.e., null value, the value we want to compare with in the null and alternative hypothesis), and need to specify the **inequality sign** (not always *two.sided*).
+  
+Format: *t.test(x, mu = mu0, alternative = ..., conf.level = 1 - alpha)*  
+where:  
+*x*: the variable that we want to perform the hypothesis test for the mean (use the sample mean of $x$ to estimate $\mu$, the sample mean $\bar{x}$ is used when computing the test statistic)  
+*mu*: the hypothesized value that appears in both null and alternative hypotheses  
+*alternative*: the inequality sign in the alternative hypothesis ($<$: "less"; $>$: "greater"; $\neq$: "two.sided")  
+*conf.level*: confidence level $1 - \alpha$  
+
+```{r}
+x = survey$time.exercise[survey$year =="Freshman"]
+```
+
+We want to test whether the mean exercise hours for college freshman students is greater than $1$ hour per day. Use $\alpha = 0.01$  
+$H_a$: $\mu > 1$  
+*mu = 1* (hypothesized value), *alternative = "greater"* (the inequality sign is $>$)  
+```{r}
+t.test(x, mu = 1, alternative = "greater", conf.level = 1 - 0.01)
+```
+
+Since the p-value is $0.0004746 < 0.01$, we will **reject** the null hypothesis.  
+
+## f
+Conduct $5$-step hypothesis test to determine whether the population mean number of exercise hour for college freshman is greater than $1$ hour. Use t.test output from the previous part.  
+
+### Answer
+\underline{Step 1, Check the Assumptions}:  
+Assumptions: **random sample** and **normal population** (robustness of t-procedure if sample size $n$ is large enough).  
+Random sample assumption is not met. Instead, this is a **volunteer sample**, since the students volunteered to fill out the survey from STAT 3011 Spring 2025.  
+Normal population assumption is not met either. As we saw from the histogram, the data distribution is right-skewed, which indicates that population distribution mighe also be skewed. However, t-procedure is **robust to non-normality** especially when sample size is large, where $n = 91 > 30$ satisfies the large sample size requirement.  
+  
+\underline{Step 2, Hypothesis}:  
+We want to test whether freshmen students exercise **more than** ($>$) $1$ (hypothesized value) hour per day.  
+$H_0$: $\mu = 1$ (we always and only include $=$ in the null hypothesis in STAT 3011)  
+$H_a$: $\mu > 1$ (since we want to check if $\mu$ is **more than** $1$)  
+  
+\underline{Step 3, Test Statistic}:  
+Test statistic $T = \frac{\bar{x} - \mu_0}{s / \sqrt{n}} \sim t_{n - 1}$  
+Plugging the numbers in the context in, we have:  
+$t = \frac{1.34 - 1}{0.94 / \sqrt{91}} \sim t_{91 - 1}$  
+```{r}
+(xbar - 1) / (s / sqrt(n))
+```
+
+The value of the test statistic, $t ^ {*} = \frac{1.34 - 1}{0.94 / \sqrt{91}} = 3.418015$  
+Interpretation of the test statistic: The observed sample mean of $1.34$ hours from this data is $3.418$ standard errors above the hypothesized population mean ($\mu_0 = 1$ from the null hypothesis).  
+  
+\underline{Step 4, p-value}:  
+From *t.test* outcome, the p-value is $0.00047$.  
+
+```{r}
+pt(3.418015, df = 91 - 1, lower.tail = F)
+```
+
+For right tailed test computed by the *pt()* function, p-value = $P(T > 3.418) = 0.00047$.  
+Interpretation of the p-value: If we assume the null hypothesis is true, the probability of obtaining test stat of $3.418$ or more extreme is $0.00047$.  
+  
+OR  
+  
+If the population mean exercise hours for freshman college students is $1$ hour, then the change of obtaining sample mean of $1.34$ hr or more extreme is $0.00047$.  
+  
+This sample mean is extremely unlike if the null is true, so our assumption might be false and the null hypothesis is not true.   
+  
+\underline{Step 5, Conclusion}:  
+p-value is $0.00047 < \alpha = 0.01$. We reject the null hypothesis at the significance level $\alpha = 0.01$ (or the confidence level $1 - \alpha = 0.99$. We have enough evidence to conclude that the population mean exercise hours for freshman college students is greater than $1$.  

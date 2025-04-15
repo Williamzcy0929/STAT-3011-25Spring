@@ -1,0 +1,279 @@
+---
+title: "Week 9 Lab Code"
+author: "Section 019"
+date: "2025-03-25"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Problem 1
+### *qt()* Function
+Use *qt()* function to get the corresponding $t$-value of $P(T \leq t) = p$ given the probability $p$ for a **t distribution** with the specified degree of freedom ($df$).  
+Similar to *qnorm()* function, *qt()* function will return a $t$-value (percentile or quantile, q stands for quantile) corresponding to a given probability.  
+Format: *qt(p, df = df)* (return $t$ such that $P(T \leq t) = p$ - left side probability)  
+**Arguments**:  
+*df*: degree of freedom, need to be explicitly specified in the command (because *df* is a compulsory parameter for t-distribution, and there is no default value of *df* in R). We usually use $df = n - 1$ when constructing confidence interval for $\mu$.  
+*lower.tail*: extend *qt()* function for right side ($>$ or $\geq$) probability.  
+
+What values of t-multiplier $t_{\alpha / 2}$ is used to construct:  
+
+## a
+a $92\%$ confidence interval to estimate $\mu$ if the sample size is $9$. (Assume that random sample assumption and normal population assumptions are met).  
+
+### Answer
+```{r, echo = FALSE}
+curve(dt(x, df = 8),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      main = "92% Confidence Interval, Sample Size = 9",
+      lwd = 2)
+
+x_high = seq(-2.004152, 2.004152, length.out = 200)
+y_high = dt(x_high, df = 8)
+polygon(x = c(-2.004152, x_high, 2.004152),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+Here, we want to find the t-multiplier $t$ such that $P(-t < T < t) = 0.92$, i.e., $P(T < -t) + P(T > t) = 1 - 0.92 = 0.08$. Since t distribution is symmetric, $P(T < -t) = P(T > t) = \frac{0.08}{2} = 0.04$.  
+Since the sample size is $9$, the degree of freedom (argument *df*) of the t-distribution is $9 - 1 = 8$.  
+
+We want to find the quantile $t$ that $P(T \leq t) = 1 - \frac{0.08}{2} = 0.96$.  
+```{r}
+qt(1 - 0.08 / 2, df = 8)
+```
+
+Similarly, $P(T \leq t) = 0.96$ is the same as $P(T > t) = 1 - 0.96 = 0.04$ (right tail probability, using the argument *lower.tail = FALSE*).  
+```{r}
+qt(0.08 / 2, df = 8, lower.tail = F)
+```
+
+Use the negative t-multiplier ($P(T < t) = \frac{0.08}{2} = 0.04$), but we usually use the positive t-multiplier to construct the confidence interval.  
+```{r}
+qt(0.08 / 2, df = 8)
+```
+
+## b
+a $98\%$ confidence interval to estimate $\mu$ if the sample size is $1982$. (Assume that random sample assumption is met.)  
+
+### Answer
+Since the t-procedure is robust to non-normality if the sample is randomly drawn (because we do not know what the population distribution is), we can still use the t-distribution to constuct the confidence interval.   
+```{r, echo = FALSE}
+curve(dt(x, df = 1981),
+      from = -3, to = 3,
+      col = "black",
+      xlab = "",
+      ylab = "",
+      main = "98% Confidence Interval, Sample Size = 1982",
+      lwd = 2)
+
+x_high = seq(-2.328232, 2.328232, length.out = 200)
+y_high = dt(x_high, df = 1981)
+polygon(x = c(-2.328232, x_high, 2.328232),
+        y = c(0, y_high, 0),
+        col = rgb(1, 0, 0, alpha = 0.4),
+        border = NA)
+```
+
+Here, we want to find the t-multiplier $t$ such that $P(-t < T < t) = 0.98$, i.e., $P(T < -t) + P(T > t) = 1 - 0.98 = 0.02$. Since t distribution is symmetric, $P(T < -t) = P(T > t) = \frac{0.02}{2} = 0.01$.  
+Since the sample size is $1982$, the degree of freedom (argument *df*) of the t-distribution is $1982 - 1 = 1981$.  
+
+We want to find the quantile $t$ that $P(T \leq t) = 1 - \frac{0.02}{2} = 0.99$.  
+```{r}
+qt(1 - 0.02 / 2, df = 1981)
+```
+
+Similarly, $P(T \leq t) = 0.99$ is the same as $P(T > t) = 1 - 0.99 = 0.01$ (right tail probability, using the argument *lower.tail = FALSE*).  
+```{r}
+qt(0.02 / 2, df = 1981, lower.tail = F)
+```
+
+\newpage
+
+# Problem 2
+In this problem, we will use the class survey data set. You will need to import data set again within the scope of R markdown. For the sake of this problem, assume that the variable college GPA represents a random sample of 289 college students. We will calculate a $95\%$ confidence interval manually using $\bar{x}\pm t_{\alpha/2} \frac{s}{\sqrt{n}}$, then use `t.test()` command.  
+
+Use the following command to import the survey data set.  
+```{r}
+survey = read.csv("http://users.stat.umn.edu/~parky/survey_S25.csv")
+```
+
+## a
+Use `names( )` to see the names of all variables. What is the exact name of the variable that represents college GPA?  
+
+### Answer
+```{r}
+names(survey)
+```
+
+The variable *c.gpa* is the variable that represents college GPA.  
+
+## b
+Find sample size ($n$), sample mean ($\bar{x}$, point estimate of population mean), sample standard deviation ($s$), standard error ($SE = \frac{s}{\sqrt{n}}$), t-multiplier ($t_{\alpha/2}$), margin of error ($t_{\alpha/2} \frac{s}{\sqrt{n}}$).  
+
+### Answer
+```{r}
+#rename (since we want to use a shorter term for survey$c.gpa)
+#create a new variable x to store survey$c.gpa
+x = survey$c.gpa
+```
+
+**sample size**: number of observations in our sample.  
+Use *length()* function to get the length of a vector (or a variable).  
+Format: *length(vector_name)*  
+```{r}
+(n = length(x)) #R will print the outputs if we put () around a command
+```
+
+**sample mean** ($\bar{x}$, point estimate of population mean).  
+```{r}
+(xbar = mean(x))
+```
+
+**sample standard error**: $s$ (used to estimate the population standard deviation $\sigma$), measures how much a typical student's GPA varies from the sample mean from this sample of $289$ students.  
+```{r}
+(s = sd(x))
+```
+
+**standard error**: estimates how much typical **sample mean** (with sample size $289$) vary from the population mean when we repeatedly draw random samples. or average distance between a sample mean from $n = 289$ and the center of the sampling distribution of sample mean ($mu_{\bar{x}}$, which is the same as population mean $\mu$).  
+$se = \frac{s}{\sqrt{n}}$, where $s$ is the **sample standard deviation**, $n$ is the **sample size**.  
+```{r}
+(se = s / sqrt(n))
+```
+
+**error probability** ($\alpha$): in the long run, the proportion of the times this method produces interval that doesn't contain the true parameter.  
+```{r}
+(alpha = 0.04)
+```
+
+**t-multiplier**: how many standard errors to add to the point estimate, computed by the *qt()* command.  
+General command for any error probability ($\alpha$) and sample size ($n$): `t = qt(1 - alpha / 2, df = n - 1)`  
+```{r}
+(t = qt(1 - alpha / 2, df = n - 1))
+```
+
+or plug the numbers in:  
+```{r}
+(t = qt(1 - 0.04 / 2, df = 289 - 1))
+```
+
+**margin of error**: estimates how much most ($96\%$ in this example - confidence level) of sample means fall within from the true population mean - has the same unit as $x$.    
+$\text{moe} = t_{\alpha / 2} \times SE$  
+```{r}
+(moe = t * se)
+```
+
+## c
+Calculate a $96%$ confidence interval.  
+Recall a $1 - \alpha$ confidence interval for $\mu$ is:  
+$$\bar{x}\pm t_{\alpha/2}\frac{s}{\sqrt{n}}$$  
+
+### Answer
+Here $1 - \alpha = 96\%$, $\alpha = 0.04$.  
+```{r}
+#essential computation
+xbar = mean(x) #sample mean
+s = sd(x) #sample standard deviation
+n = length(x) #sample size
+alpha = 0.04 #error probability
+t = qt(1 - alpha / 2, df = n - 1) #t-multiplier
+
+#vetorized computation: c(-1, 1) * t * se adds and subtracts margin of error
+xbar + c(-1, 1) * t * (s / sqrt(n))
+```
+
+$\bar{x} + \text{c(-1, 1)} \times t \times \frac{s}{\sqrt(n)}$ will create a vector $\left(\bar{x} + (-1) \times t \times \frac{s}{\sqrt(n)}, \bar{x} + 1 \times t \times \frac{s}{\sqrt(n)}\right) = \left(\bar{x} - t \times \frac{s}{\sqrt(n)}, \bar{x} + t \times \frac{s}{\sqrt(n)}\right)$  
+
+The $96\%$ confidence interval is $[3.124419, 3.367159]$.  
+
+\newpage
+
+## d
+Confidence interval for mean has two assumptions.  
+
+- Random sample: We assume that the survey represents a random sample of college students. Generally, to check the random sample assumption, we need to know how the observations were selected.  
+
+- Normality assumption: To determine whether the population distribution is normal or not, we use data distribution.  If data distribution doesn't deviate much from the normal distribution, normality assumption is met.  
+
+Construct a Q-Q plot to determine whether the normality assumption is met. If it is not met, is our result still reliable? (Does this method work $96\%$ of the time?)  
+
+### Answer
+Use *qqnorm()* function to draw the Q-Q plot.  
+Use *qqline()* function to draw the Q-Q line (used to check normality).  
+Format: *qqnorm(vector_name)*, *qqline(vector_name)*; run *qqnorm()* function first  
+```{r}
+qqnorm(x)
+qqline(x)
+```
+
+The overall distribution is left-skewed and not normal since most of the observaions are below the Q-Q line. Since there are a lot of $0$'s and $4$'s, the distribution might be bimodal.  
+However, we can still be confident in our result because when sample size $n = 289$ is large and there is no extreme outliers (robustness of t-procedure; sampling distribution is approximately normal by CLT when $n = 289 > 30$)  
+
+\newpage
+
+## e
+Use `t.test()` command to construct a 96\% confidence interval. Report the confidence interval and interpret the result.  
+
+### *t.test()* Function
+Use *t.test()* function to construct confidence interval (what we will do here) and perform hypothesis test (in the next few weeks).  
+Construct Confidence Interval: *t.test(variable_name, conf.level = 1 - alpha, alternative = "two.sided")*  
+Arguments:  
+*conf.level*: confidence level, $1 - \alpha$ for the $1 - \alpha$ confidence interval  
+*alternative*: confidence interval is **two sided**  
+**Attention**:  
+Always set the argument *alternative = "two.sided"* when constructing confidence interval.  
+Put the argument *two.sided* in a pair of quotation marks because it is a textal argument (like the title of graphs).  
+
+### Answer
+Here $1 - \alpha = 96\%$, $\alpha = 0.04$.  
+```{r}
+t.test(x, conf.level = 1 - 0.04, alternative = "two.sided")
+```
+
+**Interpretation**:  
+If we **repeatedly** select a random sample and construct a confidence interval, then **in the long run**, $96 \%$ of those intervals would **contain** the **true mean** of the variable college GPA.  
+  
+OR  
+  
+**In the long run**, $96 \%$ of the $96 \%$ confidence interval will **contain** the **true mean** of the variable college GPA.  
+  
+OR  
+  
+We are $96 \%$ confident that the interval $[3.124419, 3.367159]$ **contains** the **true population mean** of the variable college GPA.  
+
+## f
+If we increases the confidence level from $96\%$ to $99\%$, holding everything else fixed, which of the following is false?  
+
+- (i) Margin of error increases.    
+- (ii) Width of the confidence interval increases.  
+- (iii) Standard error increases.  
+- (iv) Point estimate does not change.  
+
+### Answer
+(i) is true. Margin of error $t_{\alpha/2} \frac{s}{\sqrt{n}}$ increases when confidence level increases because t-multiplier increases.  
+```{r}
+# for 96% confidence level
+alpha = 0.04
+n = 289
+qt(1 - alpha / 2, df = n - 1)
+
+# for 99% confidence level
+alpha = 0.01
+qt(1 - alpha / 2, df = n - 1)
+```
+
+t-multipler increase from $2.063092$ to $2.593008$.  
+  
+(ii) is true. Width of the confidence interval is determined by margin of error ($\text{width} = \text{upper bound} - \text{lower bound} = \bar{x} + moe - (\bar{x} - moe) = 2 \times moe$. When margin of error increases, confidence interval becomes wider.  
+  
+(iii) is false. Standard error $\frac{s}{\sqrt{n}}$ does not change when confidence level changes (no $\alpha$ in the formula, margin of error - $moe = t_{\alpha / 2} \times SE$ will change).     
+  
+(iv) is correct. Point estimate of population mean is an observed sample mean $\bar{x}$, which does not change when confidence level increases.  
