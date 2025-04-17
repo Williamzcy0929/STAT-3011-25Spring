@@ -1,5 +1,5 @@
 ---
-title: "STAT 3011 Lab Week 1"
+title: "Week 1 Lab Code"
 author: "Section 019"
 date: "2025-01-21"
 output: pdf_document
