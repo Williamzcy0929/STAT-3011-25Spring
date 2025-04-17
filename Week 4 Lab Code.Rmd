@@ -1,6 +1,6 @@
 ---
 title: "Week 4 Lab Code"
-author: "William Zhao"
+author: "Section 019"
 date: "2025-02-11"
 output: pdf_document
 ---
