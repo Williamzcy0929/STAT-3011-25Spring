@@ -1,0 +1,385 @@
+---
+title: "Week 13 Lab Code"
+author: "Section 019"
+date: "2025-04-22"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+For this lab, we will use a dataset `hold.csv` from a randomized experiment:   
+
+An airline has a toll-free telephone number that potential customers can call to make flight reservations. Usually, the call volume is heavy, and callers are placed on hold until an agent is free to answer. Researchers working for the airline recently conducted a randomized experiment to analyze whether callers would remain on hold longer if they heard   
+
+(a) an advertisement about the airline and its current promotions,  
+
+(b) recorded Muzak ("elevator music"), or   
+
+(c) recorded classical music.   
+
+Messages are five minutes long and then repeated.   
+
+# Import the Dataset
+## Option 1: Import the Dataset from Online Sources
+We will build a one-way ANOVA model for this lab. Use the following R command to import data set. (Option 2: Manually enter dataset into R. If you want to skip this optional step, go to Part 1 Problem 1. )  
+
+```{r}
+dat = read.csv("http://users.stat.umn.edu/~parky/hold.csv")
+```
+
+## Option 2: Create the Dataset Manully
+Enter the wait time for each type of recorded message  
+```{r}
+advertisement = c(2, 8, 11, 1, 5)
+muzak = c(1, 3, 4, 0, 6)
+classical = c(8, 13, 15, 7, 9)
+```
+
+Create vectors (variables) - columns in the dataset by merging the entered observations
+```{r}
+time = c(advertisement, muzak, classical)
+time
+
+message = c(rep("advertisement", 5), rep("muzak", 5), rep("classical", 5))
+message
+```
+
+*rep(value, n)* function: repeat *value* for $n$ times  
+e.g. *rep("advertisement", 5)* means repeat *"advertisement"* (text) $5$ times  
+
+Create the data frame  
+```{r}
+dat = data.frame(message, time)
+dat
+```
+
+**Data Frame** is one of the primary method to manage the dataset in R (almost all datasets we have used in this course are "data frames" in R).  
+*data.frame($x_1$, $x_2$, $\cdots$, $x_n$)*: create a data frame containing columns (variables) $x_1$, $x_2$, $\cdots$, $x_n$  
+
+Remove the name attributes of each column  
+```{r}
+rm(message)
+rm(time)
+dat
+```
+
+\newpage
+
+# Part 1: Explore
+## Problem 0
+Check the exact names of variables. What are the explanatory variable and response variable?  
+### Variable Names
+```{r}
+names(dat)
+```
+
+### First $6$ Columns
+```{r}
+head(dat)
+```
+
+### Structure of the Dataset
+```{r}
+str(dat)
+```
+
+### Summary of the Dataset
+```{r}
+summary(dat)
+```
+
+Explanatory variable (independent variable - treatment levels): *message* (types of recording, types of message)  
+In ANOVA, the explanatory variable is usually a **categorical** variable.  
+  
+Response variable: *time* (holding time before each caller hung up)  
+In ANOVA, the response variable is usually a **quantitative** variable.  
+
+## Problem 1
+Construct a side-by-side boxplot to explore the data. Predict the result of One-Way ANOVA. (Do you think we will conclude that not all population mean holding times are the same? Just guess.)  
+
+### ~ (Tilde) Formula Grammar in R
+In R, we usually use "~" for a \textbf{response-explanatory} relationship.  
+Format: \textit{response\_variable}\$\textit{explanatory\_variable}  
+We will use similar grammar later in this semester (regression).  
+
+For boxplot, \textit{response\_variable}\$\textit{explanatory\_variable} means: create a side-by-side boxplot of \textbf{response\_variable} (usually a \textbf{quantitative} variable) separated by the different levels of \textit{explanatory\_variable} (usually a \textbf{categorical} variable), which is used to \textbf{compare the distribution} of the \textbf{quantitative} variable values across different categories of the \textbf{categorical} variable.  
+
+```{r}
+# use boxplot(y ~ x) to draw side-by-side boxplot where 
+# y: response (quantitative) variable
+# x: explanatory (categorical) variable
+boxplot(dat$time ~ dat$message)
+```
+
+Since the response variable and the explanatory variable are from the **same** dataset, there is another simplification to draw the same boxplot.  
+```{r}
+boxplot(time ~ message, data = dat)
+```
+
+Optional argument: *data* - specify the dataset that used to find the variable mentioned before in the command
+Explanation: use the variable *time* and *message* from the dataset *dat*.  
+
+### Interpretation
+The classical music group shows higher scores, meaning that when classical music is played, customers hold longer than, when advertisements or muzak are played in this sample. Due to small sample sizes (each group has a sample size of 5), it is difficult to predict the result of ANOVA test.  
+  
+Note:  
+In the boxplot, we use another measurement of central tendency: **median** to approximate **mean**. Since the medians for the three groups are not approximately equal based on the boxplot, we might be able to say that not all population mean holding times are the same (reject $H_0$ in ANOVA test).  
+Similarly, we could use another measurement of spread-out tendency: **IQR** (the height of the box) to approximate **standard deviation** when checking the equal variance assumption. If the IQRs are similar, we might be able to say that the equal variance assumption is not violated.   
+
+## Problem 2
+Use the following command and identify $g$, $n_1$, $n_2$, $n_3$, $N$ (overall sample size),  $\bar{y}_1$,  $\bar{y}_2$, $\bar{y}_3$ and $\bar{y}$ (overall sample mean)  
+
+```{r}
+table(dat$message)
+```
+
+number of groups: $g = 3$  
+sample size of each group: $n_1 = n_2 = n_3 = 5$  
+
+### \textit{tapply()} Function
+Use \textit{tapply()} function to apply a R function on a \textbf{subset} of \textbf{vector}.  
+\textit{tapply()} function is another instance of \textbf{vecorized computation} in R, and it has the same vecorized computation rules:  
+If we apply an operation (a R function here) on a \textbf{vector} (a subset of a vector here), R will apply the function on \textbf{each item} simultaneously and \textbf{individually}.  
+Format: \textit{tapply(target\_vector, group\_vector, function\_name, optional arguments, $\cdots$)}  
+\textbf{Attention:}  
+\textit{target\_vector} is usually a \textbf{quantitative variable}  
+\textit{group\_vector} is usually a \textbf{categorical variable}  
+Use \textit{function\_name} \textbf{only without parentheses} (this only applies for using a R function as an \textbf{argument} in \textit{apply()} family functions, such as \textit{tapply()} here)    
+Recall: \textit{read.csv(file.choose())}, we need to keep the parentheses for \textit{file.choose()} function; we need to type parentheses \textbf{after the function name} when we \textbf{directly} use a function in R  
+
+```{r}
+# tapply(target variable, group variable, R function)
+# target variable: dat$time (quantitative)
+# group variable: dat$message (categorical)
+# R function: mean/sd (function name only, no parentheses)
+tapply(dat$time, dat$message, mean) #no parentheses for the mean function
+tapply(dat$time, dat$message, sd) #no parentheses for the sd function
+```
+
+sample mean of each group: $\bar{y_1} = 5.4$, $\bar{y_2} = 10.4$, $\bar{y_3} = 2.8$  
+
+```{r}
+mean(dat$time)
+```
+
+overall sample mean: $\bar{y} = 6.2$  
+
+\newpage
+
+# Part 2: ANOVA F-Test
+We will conduct an ANOVA F-test to see if at least two average holding times (in minutes) are different depending on the types of recorded messages.  
+
+## Problem 3
+State assumptions of ANOVA F-test.  
+
+Assumptions of ANOVA F-test:  
+  
+  * $g$ independent random samples (Those phone calls are randomly assigned to each type of recording.)  
+  * Normal populations (From the side-by-side boxplot, it seems that it is hard to tell whether each population is normal or not due to small sample size.) [optional part: check the histogram, provided at the end]  
+  * Equal variance (From the side-by-side boxplot, variability in each group is not too different since the IQRs for different groups do not vary a lot. 
+  
+Recall: ANOVA F-test is robust to non-normal, unequal variance. In this case, we can perform ANOVA F-test due to the robustness.  
+
+```{r, echo = FALSE}
+library(lattice)
+
+histogram(~time|message, data = dat)
+```
+
+
+## Problem 4
+State the null and alternative hypotheses. Use statistical notations. Remember to define parameters of interest.  
+
+$H_0$: $\mu_1 = \mu_2 = \mu_3$  
+$H_a$: At least $2$ of the population group means are unequal (Not all population group means are the same).  
+where  
+
+- $\mu_1$: population mean holding time when advertisement is played  
+- $\mu_2$: population mean holding time for muzak  
+- $\mu_3$: population mean holding time for classical music  
+
+## Problem 5
+**Part 1** Use the R command `aov()` to produce an ANOVA table.  
+
+### *aov()* Function
+Use *aov()* function to automatically perform an ANOVA F-test in R.  
+Format: *aov(response_variable ~ explanatory_variable, data)*, where the response variable is usually a **quantitative** variable, and the explanatory variable (i.e., group variable) is usually a **categorical** variable in ANOVA test  
+  
+**Note**:  
+For the "response-explanatory" relationship, we still use *~* operator here (similar to the side-by-side boxplot).  
+  
+**Attention**:  
+*aov()* function will **NOT** directly return the **ANOVA table**  
+We should create a new object to store the ANOVA F-test result, then apply *summary()* function to the test result to get the ANOVA table.  
+We will show another reason to store the test result later (in the Tukey's Test question).  
+  
+Even though the type of test is called "ANOVA F-test", **ALWAYS** use *aov()* function and **DO NOT** use the *anova()* function (*anova()* function is not designed for the type of ANOVA F-test that we are learning).  
+
+```{r}
+# aov() function will NOT return the ANOVA table
+aov(time ~ message, data = dat)
+```
+
+```{r}
+# create an object to store the test result
+m1 = aov(time ~ message, data = dat)
+
+# apply summary() function to the object to get the ANOVA table
+# summary(model_name) to print anova table
+summary(m1)
+```
+  
+**Part 2** From the ANOVA table, identify:  
+
+* Group degrees of freedom ($G - 1$): Df in the **first** row of the ANOVA table (usually including the **explanatory** variable name), $G - 1 = 2$  
+
+* Error degrees of freedom ($N - G$): Df in the **second** row of the ANOVA table (usually called **Residuals**), $N - G = 12$  
+
+* Value of F-test statistic : value under the "**F value**" part in the ANOVA table, $F ^ {*} = 6.431$  
+
+* $p$-value : value under the "**Pr(>F)**" part in the ANOVA table in the ANOVA table, $p \text{-value} = 0.0126$  
+
+  
+**Part 3** State the *distribution* of test statistic under the null hypothesis. Give the *value* of observed test statistic. Use the p-value conclude in the context of the problem. Use $\alpha=0.05$.  
+
+The distribution of the test statistic is **F distribution** with $df_1 = g - 1 = 2$ (group df) and $df_2 = N - g = 12$ (error df) **if the null hypothesis is true**.  
+Notation: $F \sim F_{2, \; 12}$ under $H_0$.  
+  
+If the null hypothesis is true (no difference among three population means), then test statistic from repeated sampling should look like F-distribution with $df_1 = 2$, $df_2 = 12$. One can check the graph of F-distribution at https://istats.shinyapps.io/FDist/  
+
+* The value of the F-stat from this sample is $6.431$ (from the ANOVA table). From the F-distribution, we can see that this test statistic is unusually large.  
+```{r, echo = FALSE}
+par(mfrow = c(1, 2))
+
+x_max = qf(0.999, df1 = 2, df2 = 12)
+
+curve(df(x, df1 = 2, df2 = 12),
+      from = 0, to = x_max,
+      lwd  = 2, col = "black",
+      xlab = "", ylab = "")
+
+x_high = seq(6.431, x_max, length.out = 400)
+y_high = df(x_high, df1 = 2, df2 = 12)
+
+polygon(c(6.431, x_high, x_max),
+        c(0, y_high, 0),
+        col = rgb(1, 0, 0, 0.40),
+        border = NA)
+
+x_max = qf(0.999, df1 = 2, df2 = 12)
+
+curve(df(x, df1 = 2, df2 = 12),
+      from = 0, to = x_max,
+      lwd  = 2, col = "black",
+      xlab = "", ylab = "",
+      xlim = c(4, 10),
+      ylim = c(0, 0.05))
+
+x_high = seq(6.431, x_max, length.out = 400)
+y_high = df(x_high, df1 = 2, df2 = 12)
+
+polygon(c(6.431, x_high, x_max),
+        c(0, y_high, 0),
+        col = rgb(1, 0, 0, 0.40),
+        border = NA)
+
+par(mfrow = c(1, 1))
+```
+
+* The $p$-value is $0.0126$ (from the ANOVA table), which is less than $\alpha = 0.05$. Hence we reject the null hypothesis and conclude that at least two population mean holding times are different (not all population mean holding times are the same).  
+
+**Part 4** Can we conclude that the type of music **causes** the difference in average waiting time?  
+
+**Causation Relationship**:  
+
+* Experiment (not an observational study)  
+* Random assignment of treatment  
+  
+Yes. Researchers **assign** different **types of recordings** (treatment) to each subject **randomly**. Hence, this data is collected from a **randomized experiment**, not an observational study. We can establish a cause-and-effect relationship from a randomized experiment.  
+Note: Due to the small sample size, researchers should take this conclusion with caution before making big changes.  
+
+\newpage
+
+# Part 3: Follow-up to ANOVA - Tukey's Honest Significance
+## Problem 6
+Use *TukeyHSD()* to construct Tukey HSD multiple comparison confidence intervals. Use a family wise confidence level of $95\%$. Identify pair(s) with statistically significant difference.  
+
+### *TukeyHSD()* Function
+Use the *TukeyHSD()* function to perform a "post hoc" Tukey's HSD Test when we reject the null hypothesis of an ANOVA test.  
+Tukey's HSD Test: Determine **which pair or pairs of population means** are different and by **how much they differ**.  
+Format: *TukeyHSD(ANOVA_result, "explanatory_variable_name", conf.level)*, where  
+
+* *ANOVA_result*: the same object that we used to get the ANOVA table (*summary(ANOVA_result)*)  
+* *explanatory_variable_name*: the explanatory variable (i.e., group variable) of the ANOVA test, which is usually categorical  
+* *conf.level*: confidence level used to draw the conclusion for each pair of population means and construct the confidence interval for the difference between population group means (Tukey's Test uses the same confidence level for all possible pairs)  
+
+```{r}
+TukeyHSD(m1, "message", conf.level = 0.95)
+```
+
+### Interpretation
+Recall: $g_1$ is advertisement, $g_2$ is muzak, $g_3$ is classical  
+```{r}
+tapply(dat$time, dat$message, mean)
+```
+
+*diff* is the observed difference between two groups.  
+e.g.: *diff* for *classical-advertisement* $= \bar{x_3} - \bar{x_1} = 10.4 - 5.4 = 5$  
+  
+*lwr* and *upr* are the lower and upper bounds of the confidence interval (with confidence level $=$ *conf.level*) for $\mu_i - \mu_j$ (difference between two population means).  
+e.g.: *lwr* and *upr* for *classical-advertisement* is the lower bound and the upper bound for $\mu_3 - \mu_1$  
+  
+*p adj* is the **adjusted** $p$-value uses another type of probability distribution (neither t-distribution nor F-distribution), this controls family-wise error rate (if we perform multiple two-sample t-test with significance level $\alpha$, the error rate will be greater than $\alpha$). We can treat it as any other $p$-value and use the same rejection rule (if $p$-value $< \alpha$, then we will reject the null hypothesis, where $\alpha$ is the significance level, $1 - \alpha$ is the confidence level), i.e., if the $p$-value is less than (or equal to) $\alpha$, then we can conclude that two group means are different.  
+  
+**Confidence Interval & Hypothesis Test**:  
+If the confidence interval for $\mu_i - \mu_j$ **ONLY** contains **negative** numbers (the lower bound and the upper bound are all negative), then we can infer that $\mu_i - \mu_j < 0$ and $\mu_i < \mu_j$.  
+If the confidence interval for $\mu_i - \mu_j$ **ONLY** contains **positive** numbers (the lower bound and the upper bound are all positive), then we can infer that $\mu_i - \mu_j > 0$ and $\mu_i > \mu_j$.  
+If the confidence interval for $\mu_i - \mu_j$ contains both **negative** and **positive** numbers ($0$ is in the confidence interval), then we usually say there is not statistically significant differences between $\mu_i$ and $\mu_j$.  
+
+## Problem 7
+Interpret the results from TukeyHSD.  
+
+* CI for $\mu_{classical}-\mu_{advertisement}$ : $(-0.74, \; 10.74)$   
+
+* CI for $\mu_{muzak} - \mu_{advertisement}$ : $(-8.34, \; 3.14)$ 
+
+* CI for $\mu_{muzak} - \mu_{classical}$ : $(-13.34, \; -1.8)$  
+
+### Interpretation
+CI for $\mu_{classical}-\mu_{advertisement}$: The difference between the mean holding time for muzak and classical music is between $(-13.34, \; -1.8)$ (in minutes), which indicates no statistically significant difference.  
+  
+CI for $\mu_{muzak} - \mu_{advertisement}$: The difference between the mean holding time for muzak and advertisement is $(-8.34, \; 3.14)$ (in minutes), which indicates no statistically significant difference.  
+  
+CI for $\mu_{muzak} - \mu_{classical}$: There is a significant difference between the population mean holding time when playing muzak and the population mean holding time when playing classical music. The population mean holding time when muzak is played is between $1.8$ and $13.34$ minutes less than when classical music is played.  
+  
+We are $95\%$ confident all confidence intervals created **simultaneously** contain the true difference.  
+
+\newpage
+
+# Optional
+Check histogram of time for each message time simultaneously.  
+Here, we will use another function called *histogram()* from an external **package** *lattice*.  
+In R, we need to **install** packages first (only need to install once), and each time before using some packages, we need to **import** these packages into the R environment.  
+
+Use *install.package("package_name")* to **install** packages (only need to install once)  
+Note: put the package name in a pair of **quotation marks**  
+```{r, eval = FALSE}
+install.packages("lattice")
+```
+
+Use *library(package_name)* to **import** packages (need to import each time before using the packages)  
+Note: no need to put the package name in quotation marks  
+```{r}
+library(lattice)
+```
+
+Use *histogram()* function from the *lattice* package to draw histograms for the distribution of different groups simultaneously.  
+Format: *histogram(~response_variable|explanatory_variable, data)*  
+Consider *|* as "conditional probability": response_variable **given that** different levels (groups) of the explanatory variable (i.e., group variable).  
+```{r}
+histogram(~time|message, data = dat)
+```

@@ -1,0 +1,397 @@
+---
+title: "Week 14 Lab Code"
+author: "Section 019"
+date: "2025-04-29"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\newpage
+
+# Dataset: High School Graduates and Crime Rates
+## Use Packages in R
+In R, there are many packages; a package bundles R code, data, documentation, and test, is easy to share with others. In this problem, we will use a data set named `crime2005` available through a R package named `smss` (Statistical Methods For The Social Sciences).  
+Packages are like "expansion packs" or "DLCs" to "vanilla" R (as we used a lot before, such as the *plot()*, *pnorm()*, *t.test()* functions, etc.), which extends some more advance methods, plots, or more datasets for "vanilla" R.  
+  
+In R, we need to **install** packages first (only need to install once), and each time before using some packages, we need to **import** these packages into the R environment.  
+  
+**Install the Packages** (Install Once):  
+We need to **install** the package before importing and using it. We only need to install the package **once** before the first time of using it, then we can import it after installing each time when we want to use the package.  
+Use the function *install.package("package_name")* to install the package (**include the quotation marks**).  
+```{r, eval = FALSE}
+# recommend: run the install.packages() function in R Console
+install.packages("smss")
+```
+
+**Import the Packages** (Import Before Using):  
+We need to **import** the package into R environment before using the package. We need to import the package **each time** before using it.  
+Use the function *library(package_name)* to import the package (**no quotation marks**).  
+```{r}
+library(smss)
+```
+
+## Import Dataset from Packages
+Use the function *data(dataset_name)* to import a dataset from an **imported package** (**include the quotation marks**).  
+```{r}
+# crime2005 dataset from the package smss
+data("crime2005")
+
+# rename the dataset (optional)
+# d = crime2005
+```
+
+Check the help document for more information about the dataset.  
+```{r, eval = FALSE}
+?crime2005
+```
+
+Explore the dataset - show a new dataset window in RStudio.  
+```{r, eval = FALSE}
+View(crime2005)
+```
+
+There are $51$ observations ($50$ states and Washington D.C.) and $8$ variables. We are considering a simple linear regression model between the following variables:  
+
+* *HS*: Percent high school graduates in a given state  
+
+* *VI2*: violent crime rate (number of violent crimes per $10,000$ population in a given state)  
+
+where *HS* is the explanatory variable and *VI2* is the response variable.  
+
+\newpage
+
+# ~ (Tilde) Formula Grammar in R
+In R, we usually use "~" for a \textbf{response-explanatory} relationship.  
+Format: \textit{response\_variable}\$\textit{explanatory\_variable}  
+We have used similar grammar for **side-by-side boxplot** and **ANOVA F-Test**.  
+
+In simple linear regression models (we only consider simple linear regression models in STAT 3011), the response variable and the explanatory variable are both **quantitative**.  
+In regression models, we usually use $y$ for the response variable and $x$ for the explanatory variable(s). In simple linear regression, the response-explanatory relationship is usually represented by $y \sim x$.  
+
+- Scatterplot: *plot(response_variable ~ explanatory_variable)*  
+- Fit the model: *lm(response_variable ~ explanatory_variable)*  
+
+\newpage
+
+# Problem 1
+Make a scatterplot and find the correlation between *VI2* and *HS* and interpret. If there is an outlier, which observation is it?  
+
+## Scatterplot
+Use the function *plot()* to generate a **scatterplot** (scatterplot is for a **response-explanatory relationship**).  
+Format: *plot(response_variable ~ explanatory_variable)*  
+Note: *plot(variable_name)* (only specify one variable name rather than a ~ formula for a response-explanatory relationship) does not generate the **scatterplot**, where the R consider the index of each observation as the explanatory variable, which is meaningless in regression analysis.  
+```{r}
+plot(crime2005$VI2 ~ crime2005$HS)
+```
+
+\newpage
+
+**Add some optional arguments**:    
+If the response variable and the explanatory variable are from the **same** dataset, there will be another simplification to draw the same boxplot by specifying the argument *data = dataset_name* (no need to use *$* in this case).  
+```{r}
+plot(VI2 ~ HS,
+     xlab = "Proportion of High School Graduate",
+     ylab = "Number of Reported Violent Crimes per 10,000", 
+     data = crime2005,
+     main = "Scatter plot")
+
+```
+
+## Correlation
+Use the function *cor()* to compute the **correlation** of **two quantitative** variables.   
+Format: *cor(variable_1, variable_2)*, where the order **does not** matter.  
+However, we usually use *cor(explanatory_variable, response_variable)* as a habit.  
+```{r}
+cor(crime2005$VI2, crime2005$HS)
+```
+
+## Explanation
+From the scatterplot and the correlation, there is a very **week** ($\lvert \text{cor} \rvert < 0.5$) **negative** **linear** association between high school graduates and violent crime rate.  
+There is at least one outlier. (The outlier is Washington D.C. - check by ordering the dataset by *VI2*)  
+
+\newpage
+
+# Problem 2
+Use *lm(y ~ x)* command to fit the linear regression model of *HS* and *VI2*. Find the following values from R output.  
+
+Use the function *lm()* ("lm" stands for "linear model") to fit a linear regression model between the response variable and explanatory variable(s).  
+Format: *lm(response_variable ~ explanatory_variable)*  
+*lm()* function primarily return the **intercept** and **slope**.  
+For more information (such as $R ^ 2$) and more details of the regression model, we need to **create an object** to **store the model**, then apply the *summary()* function on the model object (similar to ANOVA F-Test).  
+```{r}
+# intercept and slope only
+lm(crime2005$VI2 ~ crime2005$HS)
+```
+
+Similarly, since the response variable and the explanatory variable are from the **same** dataset, we can also add the argument *data* and get rid of using multiple *$*.  
+
+```{r}
+lm(VI2 ~ HS, data = crime2005)
+```
+
+* y-intercept ($a$) is: $231.25$    
+
+* slope ($b$) is: $-2.1821$  
+  
+To find $R ^ 2$ and degrees of freedom, etc., we need to use *summary()* function with *lm()* or the model object.  
+```{r}
+# more detailed output
+
+# create a new object called mod to store the linear regression model
+mod = lm(VI2 ~ HS, data = crime2005)
+
+# apply the summary() function to the model object
+summary(mod)
+```
+
+* $R ^ 2$ is: $0.1059$  
+
+* degrees of freedom ($n - 2$): $49$, where $n$ is the sample size (Recall: $n = 51$)  
+
+\newpage
+
+# Problem 3
+What is the estimated regression equation? Interpret $y$-intercept and slope.  
+
+## Regression Equation
+From the model summary, $a = 231.25$ (intercept), $b = -2.1821$.  
+Thus, the estimated regression equation is:  
+$$
+\widehat{\text{VI2}} = 231.5 - 2.1821 \times (\text{HS})
+$$
+
+## Interpretation
+$y$-Intercept ($a$): If a state has no high school graduates (the proportion of high school graduates is $0$, $x = 0$), then we expect the **average** violent crime rate to be $231.25$ ($231.25$ violent crimes per $10,000$ population).  
+**Note**:  
+The interpretation of intercept is unrealistic, as no state has the proportion of high school graduates of $0$. It is also a case of an extrapolation (using $x = 0$ value to predict $y$ when there is no observation of $x$ around $0$).  
+  
+Slope ($b$): For each $1$ **unit increase** in proportion of high school graduates (explanatory variable $x$, in this example, the unit of $x$ is “percentage point”), we expect the violent crime rate (response variable $y$) to **decrease** by an **average** of $2.18$ ($2.18$ fewer crimes per $10,000$ population) (or the average violent crime rate decreases by 2.18 per 10,000 population).  
+
+\newpage
+
+# Problem 4
+Interpret $R ^ 2$.  
+
+## Interpretation
+$R ^ 2$ is $0.1059$, meaning that $10.59\%$ of the variations in violent crime rate (*VI2*) can be explained by its linear relationship with percent of high school graduates (*HS*).  
+
+\newpage
+
+# Problem 5
+Minnesota’s percentage of high school graduates is $92.3$. Find the predicted crime rate of Minnesota. What is the residual of Minnesota? (Hint: Open the data set then find the observed violent crime rate in MN first.)  
+
+$\text{Residual} = \textbf{Observed} \text{ Value} - \textbf{Estimated} \text{ Value}$, where  
+
+- Observed Value: directly read from the dataset - **actural** value  
+- Estimated Value: computed from the linear regression equation - **predicted** value  
+
+In short: $\text{Residual} = \textbf{Actual} - \textbf{Predicted}$  
+
+## Answer
+Find the predicted violent crime numbers of MN when its high school graduate proportion is $92.3$:  
+$$
+\widehat{\text{VI2}} = 231.5 - 2.1821 \times (92.3) = 29.84
+$$
+
+The predicted violent crime numbers of MN is $29.84$.  
+  
+From the data set, Minnesota’s actual number of violent crimes per $10,000$ is $26$ (observed *VI2* $= 26.3$ - check the row *MN* in the dataset).  
+OR, use the R command (optional):  
+Use the **filter** operation (*[condition_statement]*) in R to select the value of *VI2* for MN.  
+```{r}
+crime2005$VI2[crime2005$STATE == "MN"]
+```
+
+$\text{Residual} = 26 - 29.84 = -3.54$  
+The residual of *VI2* of Minnesota is $-3.54$.  
+
+\newpage
+
+# Problem 6
+State three assumptions of simple linear regression model, and check each.  
+
+## Linearity Assumption: Scatterplot + Regression Line
+Use the function *abline()* to **add** the **regression line** to the scatterplot.  
+Format: *abline(regression_model)*, where the argument *regression_model* can be either a *lm()* function or the stored regression model object.  
+Note: ALWAYS draw the **scatterplot** (run the *plot()* function) **FIRST**, then **ADD** the regression line (run the *abline()* function) to the scatterplot. Otherwise, if we filp the order of drawing the scatterplot and adding the regression line, R will pop up an error because R cannot find a plot to add the regression line.  
+```{r}
+# draw the scatterplot
+plot(VI2 ~ HS, data = crime2005, main = "Scatterplot")
+
+# add the regression line to the scatterplot
+# use the lm() function approach
+abline(lm(VI2 ~ HS, data = crime2005))
+```
+
+```{r}
+# draw the scatterplot
+plot(VI2 ~ HS, data = crime2005, main = "Scatterplot")
+
+# add the regression line to the scatterplot
+# use the lm() function approach
+abline(mod) # mod is the stored model object
+```
+
+Linearity: From the scatterplot of *VI2* and *HS*, since most observations (except the outlier) are approximately distributed along the regression line, there is a linear association between them even though the linear relationship is a little weak.  
+Note: Generally speaking, if there is no **significant non-linear relationship**, such as curves, waves, etc., we usually say that the linearity assumption is met.  
+
+\newpage
+
+## Constant Variance: Residual Plot
+Use the command *plot(model, which = 1)* to generate the Residual Plot for linear regression models.  
+```{r}
+# residual vs. fitted plot to check constant variance assumption
+# which = 1
+plot(mod, which = 1)
+```
+
+From the Residual vs. Fitted, except for one outlier, variation of residuals is approximately the same across fitted value since the distances to the horizontal line $y = 0$ are approximately symmetric (or no significant patterns).  
+
+\newpage
+
+## Normality: Q-Q Plot
+Use the command *plot(model, which = 2)* to generate the Q-Q Plot for linear regression models.  
+```{r}
+# Q-Q plot to check the normal distribution assumption
+# which = 2
+plot(mod, which = 2)
+```
+
+From the normal Q-Q plot, except for one outlier, most obsetvations are on or close to the Q-Q line, which means that the residuals are approximately normally distributed.  
+
+\newpage
+
+# Problem 7
+Which of the following is FALSE?  
+
+(A) If we calculate correlation between *VI* (violent crime rate per $100,000$ population) and *HS* instead of *VI2* (violent crime rate per $10,000$ population), correlation will remain the same as the result from Problem 1. 
+
+(B) If we remove Washington DC from the data set, then $R ^ 2$ will increase.   
+
+(C) From $R ^ 2$, we calculate $r$ (correlation) by using $r = \sqrt{R^2}$. 
+
+(D) All of the above are true. 
+
+## Answer
+
+(A): correlation does not change when we change the unit of variable(s).  
+```{r}
+# VI: crime rate per 100k
+cor(crime2005$VI, crime2005$HS)
+# VI2: crime rate per 10k
+cor(crime2005$VI2, crime2005$HS)
+
+# generate VI from VI2 manually
+cor(crime2005$VI2 * 10, crime2005$HS)
+```
+
+Since *VI* and *VI2* are not exactly the same variable, the correlation might vary a little, but the generated *VI* from *VI2* ($\textit{VI} = 10 \times \textit{VI2}$) has exactly the same correltion to *HS* as *VI2*.  
+
+(B): DC is the outlier that does not follow the overall negative pattern, which introduces variation that is unusual compared to other observations and difficult to be explained by the linear regression model. Hence, if DC is removed, $R ^ 2$ (overall model fit) will improve because more variation can be explained by the linear regression model.  
+```{r}
+# optional code
+
+# remove DC by using the subset(data set, condition) command
+crime_NoDC = subset(crime2005, crime2005$STATE !="DC")
+# or use the filter operation
+crime_NoDC = crime2005[crime2005$STATE!="DC", ]
+
+summary(lm(VI2 ~ HS, data = crime_NoDC))
+```
+
+The $R ^ 2$ of the regression model fitted on the dataset without the observation of DC is $0.204$, which is higher than the $R ^ 2$ ($R ^ 2 = 0.1059$) of the regression model fitted on the entire dataset.  
+
+(C): Correlation has both **value** and **direction** (positive / negative sign), where the sign of the correlation is the same as the slope. Hence, $r = \pm \text{ (sign of slope) } \sqrt{R ^ 2}$.  
+
+\newpage
+
+Hint: All information needed for hypothesis test of $\beta$ and the confidence interval of $\beta$ is given by the **model summary**.  
+In the coefficient table (starting with *Coefficients:* in the model summary):  
+
+- First row *(Intercept)*: information for the intercept ($a$)  
+- Second row *explanatory_variable*: information for the slope ($\beta$)  
+
+Values:  
+
+- Estimate: unbiased point estimate (Intercept: $a$ for $\alpha$, Slope: $b$ for $\beta$)  
+- Std. Error: standard error - used to construct CIs  
+- t value: test statistic $t ^ {*}$  
+- Pr(>|t|): p-value for the hypothesis test $H_a$: $\neq 0$  
+
+# Problem 8
+Conduct a five-step hypothesis test on whether the true slope $\beta$ differs from $0$. Use $\alpha = 0.05$. Remember to interpret the conclusion in the context of the problem.  
+
+```{r}
+summary(mod)
+```
+
+## Five-step Hypothesis Test
+### Step 1: Assumption
+Assumptions:  
+
+- Linearity: linear relationship between the response variable (*VI2*) and explanatory variable (*HS*). - Scatterplot + Regression Line  
+- Constant variance: the variance of the residuals are constant. - Residual Plot (*plot(mod, which = 1)*)  
+- Normality: the residuals follow a normal distribution. - Q-Q Plot (*plot(mod, which = 2)*)  
+
+Assumptions are checked in Problem 6. Based on the results of Problem 6, all assumptions are satisfied.  
+
+### Step 2: Hypothesis
+$H_0$: $\beta = 0$ vs. $H_a$: $\beta \neq 0$  
+
+### Step 3: Test Statistic
+Since we are performing hypothesis test for the **slope**, the test statistic is the *t value* in the second row (slope) of the **coefficients table** in model summary.  
+$t ^ {*} = -2.409$  
+
+### Step 4: $p$-value
+Since we are performing hypothesis test for the **slope**, the p-value for the hypothesis test with $H_a$: $\beta \neq 0$ is the *Pr(>|t|)* in the second row (slope) of the **coefficients table** in model summary.  
+$p$-value $= 0.01980$  
+
+### Step 5: Conclusion
+Since $p$-value $= 0.01980 < \alpha = 0.05$, we reject $H_0$, thus we have enough evidence to conclude that there is a statistically significant association (while $\beta = 0$ indicates there is no association because the explanatory variable ) between the percentage of high school graduates (**explanatory** variable) and the number of violent crimes per $10,000$ population at the significance level $\alpha = 0.05$.  
+
+\newpage
+
+# Problem 9
+Construct a $95\%$ confidence interval for $\beta$. Interpret the result.  
+
+```{r}
+summary(mod)
+```
+
+From R output, we found that sample slope (slope of estimated regression equation) $b = -2.1821$, standard error (if we repeatedly draw samples, and calculate $b$, how much it varies) of $0.9058$.  
+To construct a $95\%$ confidence interval, we use:  
+$$
+b \pm t_{\alpha/2,\, df = n - 2} \times SE
+$$
+
+where:  
+
+- b: estimated slope, can be found from R summary(lm()) output - *Estimated* in the second row of the coefficient table  
+- $t_{\alpha/2, \, df = n - 2}$ t-multiplier value using `qt(1 - alpha / 2, df = n - 2)` - *df* in the row of *Residual standard error:*  
+- SE: standard error of b, can be found from R summary(lm()) output - *Std. Error* in the second row of the coefficient table  
+
+```{r}
+b = -2.1821
+t_mul = qt(1 - 0.05 / 2, df = 49) # or 49 = 51 - 2
+se = 0.9058
+
+b + c(-1, 1) * t_mul * se
+```
+
+The $95\%$ confidence interval for $\beta$ is $[-4.0023732, -0.3618268]$. We are $95\%$ confident that for each unit increase (one percentage point increase) in the proportion of high school graduates (**explanatory** variable) in a state, the **average** violent crime rate per $10,000$ population (**response** variable) decreases between $0.36$ and $4.00$.  
+
+## *confint()* Function for CI (Optional)
+Use the function *confint()* to construct CIs for all regression parameters (both intercept $\alpha$ and slope $\beta$) in linear regression models.  
+Format: *confint(regression_model, level = confidence_level)*, where the argument *regression_model* can be either a *lm()* function or the stored regression model object, the argument *level* is the confidence level $1 - \alpha$.  
+```{r}
+# use the lm() function as the argument regression_model
+confint(lm(VI2 ~ HS, data = crime2005), level = 0.95)
+```
+
+```{r}
+# use the stored model object as the argument regression_model
+confint(mod, level = 0.95)
+```
